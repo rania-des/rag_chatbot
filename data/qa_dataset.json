@@ -1,0 +1,1482 @@
+[
+  {
+    "category": "معلومات عامة",
+    "question": "كيف يمكنني الاتصال بالمدرسة؟",
+    "answer": "يمكنك الاتصال بالمدرسة عبر الهاتف على الرقم +216 71 123 456 أو عبر البريد الإلكتروني contact@ecole.tn."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيف يمكن إعادة تعيين كلمات مرور الطلاب؟",
+    "answer": "قم بزيارة مكتب تكنولوجيا المعلومات أو استخدم رابط 'نسيت كلمة المرور' في التطبيق."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "متى يبدأ العام الدراسي؟",
+    "answer": "يبدأ العام الدراسي في منتصف سبتمبر."
+  },
+  {
+    "category": "الانضباط",
+    "question": "هل يمكن طرد الطلاب؟",
+    "answer": "نعم، بسبب المخالفات المتكررة أو المخالفات الخطيرة."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "كيف يمكن استلام تحديثات المدرسة؟",
+    "answer": "يتم إرسال التحديثات عبر نظام الإشعارات في التطبيق والبريد الإلكتروني."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "لا يمكنني تسجيل الدخول، ماذا يجب أن أفعل؟",
+    "answer": "تأكد من استخدام بيانات الاعتماد الصحيحة. إذا لم تكن كذلك، أعد تعيين كلمة المرور الخاصة بك."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "من هو مدير المدرسة؟",
+    "answer": "مدير المدرسة هو السيد محمد بن صالح."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "كيف يمكنني العثور على جدول حصصي؟",
+    "answer": "يتم نشر جداول الحصص في التطبيق وعلى لوحات الفصول الدراسية."
+  },
+  {
+    "category": "الانضباط",
+    "question": "ما هي قواعد المدرسة؟",
+    "answer": "تشمل القواعد احترام المعلمين، وعدم استخدام الهواتف في الفصل، والالتزام بالوقت."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "كيفية تحديث تطبيق المدرسة؟",
+    "answer": "انتقل إلى متجر التطبيقات أو متجر Play واضغط على 'تحديث' في صفحة التطبيق."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "ما هي ساعات الدوام المدرسي؟",
+    "answer": "المدرسة مفتوحة من الساعة 8:00 صباحًا حتى 4:00 مساءً، من الاثنين إلى الجمعة."
+  },
+  {
+    "category": "الانضباط",
+    "question": "ما هي عقوبة الغش؟",
+    "answer": "يؤدي الغش إلى تحذير، ودرجة صفر، وإخطار الوالدين."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "أين تقع المدرسة؟",
+    "answer": "تقع المدرسة في وسط تونس العاصمة، بالقرب من ساحة باستور."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "ما هي العطل المدرسية؟",
+    "answer": "تتبع المدرسة التقويم الرسمي للعطل التونسية."
+  },
+  {
+    "category": "الانضباط",
+    "question": "كيف يتم مراقبة الحضور؟",
+    "answer": "يقوم المعلمون بتسجيل الحضور يوميًا والإبلاغ عن حالات الغياب إلى الإدارة."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "التطبيق لا يعمل، ماذا يجب أن أفعل؟",
+    "answer": "أعد تشغيل جهازك وتحقق من وجود تحديثات للتطبيق أو اتصل بالدعم الفني."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيف يمكن للطلاب الإبلاغ عن الغياب؟",
+    "answer": "يجب على الطلاب تقديم مذكرة موقعة من الوالدين وإبلاغ معلمهم."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "هل يمكن للوالدين الوصول إلى قوائم الغداء؟",
+    "answer": "نعم، يتم نشر قائمة الكافتيريا أسبوعيًا في التطبيق."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "نسيت اسم المستخدم الخاص بي، كيف يمكنني استعادته؟",
+    "answer": "قم بزيارة مكتب تكنولوجيا المعلومات بالمدرسة أو انقر على 'نسيت اسم المستخدم' في التطبيق."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "متى الامتحان القادم؟",
+    "answer": "جداول الامتحانات متاحة في التطبيق ضمن علامة التبويب 'الامتحانات'."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيفية التحقق من درجات الطالب؟",
+    "answer": "يمكن مشاهدة الدرجات من خلال بوابة الوالدين في التطبيق."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "كيف يمكن للوالدين الاتصال بالمعلمين؟",
+    "answer": "يمكن للوالدين مراسلة المعلمين عبر التطبيق أو جدولة اجتماع."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "ماذا يحدث إذا تأخر الطالب؟",
+    "answer": "يجب على الطلاب المتأخرين تسجيل الدخول في مكتب الاستقبال وقد يواجهون إجراءات تأديبية."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "هل يمكن للوالدين الاطلاع على الواجبات المنزلية؟",
+    "answer": "نعم، يتم إدراج الواجبات المنزلية في التطبيق تحت كل مادة."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "هل تتوفر خريطة للمدرسة؟",
+    "answer": "نعم، تتوفر خريطة المدرسة في التطبيق ضمن قسم 'المعلومات'."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "هل توفر المدرسة وسائل نقل؟",
+    "answer": "نعم، تتوفر حافلات مدرسية. يمكنك التحقق من المسارات والجداول الزمنية في التطبيق."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيفية التقدم بطلب للحصول على شهادة مدرسية؟",
+    "answer": "يمكنك طلب شهادة عبر التطبيق أو بزيارة مكتب الإدارة."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيفية طلب جلسة تدريس خصوصي؟",
+    "answer": "تحدث إلى معلمك أو قدم طلبًا من خلال قسم 'المساعدة' في التطبيق."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "ما هي سياسة تقييم الامتحانات؟",
+    "answer": "يتم تقييم كل امتحان من 20 درجة. يحدد المتوسط الدرجة النهائية."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "هل يمكن للطلاب إعادة الامتحانات؟",
+    "answer": "نعم، يُسمح بإعادة الامتحانات للغياب المبرر أو الدرجات المنخفضة، بعد الموافقة."
+  },
+  {
+    "category": "الانضباط",
+    "question": "كيف يتم تأديب الطلاب على التأخير؟",
+    "answer": "قد يؤدي التأخير المتكرر إلى تحذيرات أو الاتصال بالوالدين أو الاحتجاز."
+  },
+  {
+    "category": "الانضباط",
+    "question": "هل يُسمح باستخدام الهواتف في الفصل؟",
+    "answer": "لا، يجب إغلاق الهواتف وتخزينها بعيدًا أثناء الفصل."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "كيف يمكن للوالدين جدولة اجتماع مع المدير؟",
+    "answer": "يمكن للوالدين جدولة اجتماع من خلال التطبيق أو الاتصال بمكتب المدرسة."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "هل يمكن لكلا الوالدين الوصول إلى التطبيق؟",
+    "answer": "نعم، يمكن لكلا الوالدين إنشاء حسابات باستخدام معرف الطالب."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "التطبيق يتعطل عند فتحه، ماذا يجب أن أفعل؟",
+    "answer": "قم بمسح ذاكرة التخزين المؤقت للتطبيق وأعد تشغيل هاتفك. إذا استمرت المشكلة، اتصل بالدعم."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "كيفية الإبلاغ عن خلل في التطبيق؟",
+    "answer": "استخدم ميزة 'الإبلاغ عن مشكلة' في إعدادات التطبيق أو اتصل بالدعم الفني."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "هل هناك نشرة إخبارية للمدرسة؟",
+    "answer": "نعم، يتم إرسال النشرات الإخبارية الشهرية عبر البريد الإلكتروني وهي متاحة في التطبيق."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "هل هناك جولات مدرسية للطلاب الجدد؟",
+    "answer": "نعم، تُقام جولات المدرسة في بداية كل فصل دراسي."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "ما هي اللغات التي يتم تدريسها؟",
+    "answer": "تُدرس المدرسة اللغة العربية والفرنسية والإنجليزية."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "هل هناك قواعد للزي المدرسي؟",
+    "answer": "نعم، يجب على الطلاب ارتداء الزي المدرسي المناسب من الاثنين إلى الخميس."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "هل تقدم المدرسة أنشطة خارج المنهج الدراسي؟",
+    "answer": "نعم، تشمل النوادي الروبوتات والمسرح والرياضة والموسيقى."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "هل يمكن للطلاب تغيير الفصول الدراسية؟",
+    "answer": "تتطلب تغييرات الفصول موافقة الوالدين والتحقق من صحة الإدارة."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيفية طلب كشف درجات؟",
+    "answer": "يمكن طلب كشوف الدرجات من مكتب الإدارة أو من خلال التطبيق."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "هل يتوفر دعم نفسي؟",
+    "answer": "نعم، لدى المدرسة مستشار متاح عن طريق تحديد موعد."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيفية التقدم بطلب للحصول على مساعدة مالية؟",
+    "answer": "قم بزيارة مكتب المدرسة مع المستندات المطلوبة للتقدم بطلب للحصول على مساعدة."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "هل يمكن للطلاب استخدام المكتبة بعد المدرسة؟",
+    "answer": "نعم، المكتبة مفتوحة حتى الساعة 5:30 مساءً في أيام الأسبوع."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "كيفية الاستعداد للامتحانات النهائية؟",
+    "answer": "يقدم المعلمون جلسات مراجعة ومواد من خلال التطبيق."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "أين يمكنني العثور على نتائج الامتحانات؟",
+    "answer": "يتم نشر النتائج في التطبيق تحت 'الدرجات'."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "هل امتحانات منتصف الفصل إلزامية؟",
+    "answer": "نعم، امتحانات منتصف الفصل جزء أساسي من تقييم الطالب."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "متى يتم جدولة اجتماعات أولياء الأمور والمعلمين؟",
+    "answer": "تحدث الاجتماعات بعد كل فصل دراسي. يتم الإعلان عن المواعيد عبر التطبيق."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "ما هي مدة الامتحانات؟",
+    "answer": "تختلف مدة الامتحانات حسب المادة، عادة ما بين ساعة وساعتين."
+  },
+  {
+    "category": "الانضباط",
+    "question": "هل يمكن للطلاب الاستئناف ضد قرار تأديبي؟",
+    "answer": "نعم، يمكن للطلاب أو الوالدين طلب اجتماع مع الإدارة."
+  },
+  {
+    "category": "الانضباط",
+    "question": "ما هو السلوك الذي يعتبر غير مقبول؟",
+    "answer": "لا يتم التسامح مع التنمر والاحتقار والغش والتخريب."
+  },
+  {
+    "category": "الانضباط",
+    "question": "كيف يتم التعامل مع النزاعات في المدرسة؟",
+    "answer": "تتبع المدرسة سياسة لحل النزاعات تشمل المعلمين والمستشارين."
+  },
+  {
+    "category": "الانضباط",
+    "question": "هل يمكن للطلاب الإبلاغ عن التنمر؟",
+    "answer": "نعم، يمكن للطلاب الإبلاغ بشكل مجهول عبر التطبيق أو التحدث إلى مستشار."
+  },
+  {
+    "category": "الانضباط",
+    "question": "هل هناك ساعات احتجاز؟",
+    "answer": "نعم، يتم عقد الاحتجاز في عصر يوم الجمعة للمخالفات التأديبية."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "كيف يمكن للوالدين تلقي إشعارات الطوارئ؟",
+    "answer": "يتم إرسال تنبيهات الطوارئ عبر الرسائل القصيرة والإشعارات في التطبيق."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "هل يمكن للوالدين حضور الفعاليات المدرسية؟",
+    "answer": "نعم، يُرحب بالوالدين في جميع الفعاليات المدرسية العامة."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "كيفية التطوع للأنشطة المدرسية؟",
+    "answer": "استخدم قسم 'المشاركة' في التطبيق أو اتصل بسكرتير المدرسة."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "كم مرة يتم إصدار بطاقات التقارير؟",
+    "answer": "يتم إصدار بطاقات التقارير ثلاث مرات في السنة، مرة واحدة في كل فصل دراسي."
+  },
+  {
+    "category": "أسئلة الوالدين",
+    "question": "هل يمكنني تنزيل بطاقة تقرير طفلي؟",
+    "answer": "نعم، بطاقات التقارير متاحة للتنزيل في قسم الوالدين من التطبيق."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "كيفية تغيير لغة التطبيق؟",
+    "answer": "انتقل إلى الإعدادات واختر لغتك المفضلة."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "ما هي الأجهزة التي تدعم التطبيق؟",
+    "answer": "التطبيق مدعوم على أندرويد 8+ و iOS 12+."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "لماذا لا تظهر الإشعارات؟",
+    "answer": "تأكد من تمكين الإشعارات في إعدادات هاتفك وأذونات التطبيق."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "كيفية مزامنة البيانات إذا كنت غير متصل بالإنترنت؟",
+    "answer": "يتم مزامنة التطبيق تلقائيًا بمجرد الاتصال بالإنترنت."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "كيف يمكنني تقديم ملاحظات حول التطبيق؟",
+    "answer": "استخدم خيار 'الملاحظات' في قائمة الإعدادات."
+  },
+  {
+    "category": "أخرى",
+    "question": "هل هناك مكتب للمفقودات؟",
+    "answer": "نعم، يقع في مكتب استقبال الإدارة."
+  },
+  {
+    "category": "أخرى",
+    "question": "هل هناك مقصف في المدرسة؟",
+    "answer": "نعم، المقصف مفتوح يوميًا من الساعة 10:00 صباحًا حتى 2:00 مساءً."
+  },
+  {
+    "category": "أخرى",
+    "question": "هل يمكن للطلاب إحضار أجهزة الكمبيوتر المحمولة الخاصة بهم؟",
+    "answer": "نعم، ولكن يجب عليهم اتباع سياسة المدرسة الخاصة بالأجهزة الرقمية."
+  },
+  {
+    "category": "أخرى",
+    "question": "هل التعلم عن بعد متاح؟",
+    "answer": "نعم، يمكن جدولة الفصول الدراسية عن بعد في حالات خاصة أو طوارئ."
+  },
+  {
+    "category": "General Info",
+    "question": "Kifech nnajem ncontacti l'école?",
+    "answer": "Tnajem tcontacti l'école bil telephone fi +216 71 123 456 wella bil email fi contact@ecole.tn."
+  },
+  {
+    "category": "Student Services",
+    "question": "Kifech nreset mot de passe mta3 talaba?",
+    "answer": "Zid emchi lel bureau mta3 IT wella esta3mel 'Nsit mot de passe' fil application."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Win yebda l3am el dirassi?",
+    "answer": "L3am el dirassi yebda fi noss September."
+  },
+  {
+    "category": "Discipline",
+    "question": "Tnajem l'école tkeches talaba?",
+    "answer": "Ih, ken 3andou barcha mochkel wella amla hajja kbira."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Kifech nestelem les mises à jour mta3 l'école?",
+    "answer": "Les mises à jour yji-w 3al application w bil email."
+  },
+  {
+    "category": "Technical Support",
+    "question": "Ma njemtech nconnecti, chnowa na3mel?",
+    "answer": "Te'aked elli testa3mel les bons coordonnées. Ken non, a3mel reset lel mot de passe mte3ek."
+  },
+  {
+    "category": "General Info",
+    "question": "Chkoun el directeur mta3 l'école?",
+    "answer": "El directeur mta3 l'école houwa Si Mohamed Ben Salah."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Kifech nlaqa l'emploi du temps mte3i?",
+    "answer": "Les emplois du temps mawjoudin fil application w fil affichat mta3 les classes."
+  },
+  {
+    "category": "Discipline",
+    "question": "Chnowa heya les règles mta3 l'école?",
+    "answer": "El règles yetshabou fe7terem les profs, memnoua3 el téléphones fel classe, w lazem tji fil wa9t."
+  },
+  {
+    "category": "Technical Support",
+    "question": "Kifech njadded l'application mta3 l'école?",
+    "answer": "Emchi lel App Store wella Play Store w enzel 3ala 'Mise à jour' fel page mta3 l'application."
+  },
+  {
+    "category": "General Info",
+    "question": "Chneya sa3at el 9raya?",
+    "answer": "L'école maftoha men 8:00 el sbah lel 4:00 ba3d el dohor, men Lethneyn lel Jom3a."
+  },
+  {
+    "category": "Discipline",
+    "question": "Chneya el 3i9ab mta3 el cheating?",
+    "answer": "El cheating yetna7alou 3lih avar, note zéro, w yeblag el waldeen."
+  },
+  {
+    "category": "General Info",
+    "question": "Win toji l'école?",
+    "answer": "L'école mawjouda fel centre mta3 Tunis, 9rib men Place Pasteur."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Waqtech el 3otla mta3 l'école?",
+    "answer": "L'école tetba3 el calendrier el tounssi mta3 el 3otlat."
+  },
+  {
+    "category": "Discipline",
+    "question": "Kifech tetsajjel el presence?",
+    "answer": "El profs y9aydou el presence kol nhar w yeb3thou el ghiyabat lel administration."
+  },
+  {
+    "category": "Technical Support",
+    "question": "El application ma temchich, chnowa na3mel?",
+    "answer": "A3mel restart lel telephone mte3ek w check ken famma mise à jour lel application wella appelli tech support."
+  },
+  {
+    "category": "Student Services",
+    "question": "Kifech talba ynajem yballegh 3ala ghiyab?",
+    "answer": "Lazem el talaba yjibou warqa memdhiya men 3and el waldeen w y3almou el prof mte3hom."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "El waldeen ynejmo ychoufou el menu mta3 el mekla?",
+    "answer": "Ih, el menu mta3 el cafétéria yetnachar kol jemaa fel application."
+  },
+  {
+    "category": "Technical Support",
+    "question": "Nsit el username mte3i, kifech nraja3ha?",
+    "answer": "Zid emchi lel bureau mta3 IT wella enzel 3al 'Nsit Username' fel application."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Waqtech el examen el jey?",
+    "answer": "Planning mta3 les examens mawjoud fel application ta7t 'Examens'."
+  },
+  {
+    "category": "Student Services",
+    "question": "Kifech netfaqqed les notes mta3 el talaba?",
+    "answer": "Les notes mawjoudin fel espace parent fel application."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Kifech el waldeen ynejmo ycontactiw les profs?",
+    "answer": "El waldeen ynejmo yeb3thou messages lel profs 3al application wella ya3mlo rendez-vous."
+  },
+  {
+    "category": "Student Services",
+    "question": "Chnowa yssir ken taleb iji mte'akhir?",
+    "answer": "El talaba elli yjiw mte'akhrin lazem ysigniw 3and reception w ynejmo yakhdhw 3i9ab."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Ynejmo el waldeen ychoufou el devoirs?",
+    "answer": "Ih, el devoirs menthoumin fel application ta7t kol madda."
+  },
+  {
+    "category": "General Info",
+    "question": "Mawjoud khartet l'école?",
+    "answer": "Ih, khartet l'école mawjouda fel application ta7t 'Info'."
+  },
+  {
+    "category": "General Info",
+    "question": "L'école t3adi transport?",
+    "answer": "Ih, famma bus mta3 l'école. Tnajem tchouf les trajets w les horaires fel application."
+  },
+  {
+    "category": "Student Services",
+    "question": "Kifech natlab certificat mel l'école?",
+    "answer": "Tnajem tatlab certificat 3al application wella tziid tmchi lel bureau mta3 admin."
+  },
+  {
+    "category": "Student Services",
+    "question": "Kifech natlab séance mta3 soutien?",
+    "answer": "Ahki m3a el prof mte3ek wella atlab par l'application fel 'Mosa3ada'."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Chnowa heya reglement mta3 les notes fel examens?",
+    "answer": "Kol examen mtayem 3la 20. El moyenne ta3ti el note finale."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Ynejmo el talaba y3awdo el examens?",
+    "answer": "Ih, el talaba ynejmo y3awdo el examens ken 3andhom ghiyab mbarrar wella note wa7la, ba3d mowafa9at l'administration."
+  },
+  {
+    "category": "Discipline",
+    "question": "Kifech el talaba yet3a9bo 3ala takhir?",
+    "answer": "El takhir el marrat barcha ynajem yjiib avertissement, ittisal bel waldeen, wella 7abs."
+  },
+  {
+    "category": "Discipline",
+    "question": "Yenjem el telephone yetsta3mel fel classe?",
+    "answer": "La, el telephone lazem yetsakkar w yettkhaba wa9t el classe."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Kifech el waldeen ynejmo y3amlo rendez-vous m3a el directeur?",
+    "answer": "El waldeen ynejmo yplanifiw rendez-vous 3al application wella yappelliw lel bureau mta3 l'école."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Ynejmo zouz waldeen y'accediw lel application?",
+    "answer": "Ih, zouz waldeen ynejmo ya3mlo comptes bil ID mta3 el taleb."
+  },
+  {
+    "category": "Technical Support",
+    "question": "El application tet9allas ki nfatha, chnowa na3mel?",
+    "answer": "Farragh el cache mta3 el application w a3mel restart lel telephone. Ken el mochkla mazelt, contacti support."
+  },
+  {
+    "category": "Technical Support",
+    "question": "Kifech nsignal bug fel application?",
+    "answer": "Esta3mel 'Signali Mochkla' fel paramètres mta3 el application wella contacti tech support."
+  },
+  {
+    "category": "General Info",
+    "question": "Famma newsletter mta3 l'école?",
+    "answer": "Ih, newsletter yji kol chhar bil email w mawjoud fel application."
+  },
+  {
+    "category": "General Info",
+    "question": "Famma ziyarat lel l'école lel talaba jdod?",
+    "answer": "Ih, ziyarat l'école yssiro fel bdayet mta3 kol semestre."
+  },
+  {
+    "category": "General Info",
+    "question": "Chneya el loghat elli yet3almou?",
+    "answer": "L'école t3allem 3arbi, français, w anglais."
+  },
+  {
+    "category": "General Info",
+    "question": "Famma code vestimentaire?",
+    "answer": "Ih, el talaba lazem yelbso el uniform mta3 l'école men Lethneyn lel Khmis."
+  },
+  {
+    "category": "General Info",
+    "question": "L'école t3adi activités extrascolaires?",
+    "answer": "Ih, el club-et fihom robotique, thé'atre, sport, w musi9a."
+  },
+  {
+    "category": "Student Services",
+    "question": "Ynejmo el talaba ybadlo classes?",
+    "answer": "Tbadil el classes yesta7a9 mowafa9at el waldeen w mowafa9at administration."
+  },
+  {
+    "category": "Student Services",
+    "question": "Kifech natlab relevé de notes?",
+    "answer": "El relevé de notes ynajem yettatleb mel bureau mta3 administration wella 3al application."
+  },
+  {
+    "category": "Student Services",
+    "question": "Famma mosa3ada psychologique?",
+    "answer": "Ih, l'école 3andha psychologue mawjoud bil rendez-vous."
+  },
+  {
+    "category": "Student Services",
+    "question": "Kifech natlab aide financière?",
+    "answer": "Zid mchi lel bureau mta3 l'école bil papiers elli lazem bech tatlab aide."
+  },
+  {
+    "category": "Student Services",
+    "question": "El talaba ynejmo yesta3mlo el maktba ba3d el 9raya?",
+    "answer": "Ih, el maktba mafto7a 7atta 5:30 msa3 fel iyemet mta3 l'école."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Kifech net7adhar lel examens finaux?",
+    "answer": "Les profs y3atiw cours mta3 revision w mwad 3al application."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Win najem nl9a netaiij mta3 el examens?",
+    "answer": "El netaiij yet7attou fel application ta7t 'Notes'."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "El examens mta3 trimestre obligatoires?",
+    "answer": "Ih, el examens mta3 trimestre obligatoires w mhemmin lel ta9yiim."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Waqtech yssiro les réunions parents-professeurs?",
+    "answer": "El réunions yssiro ba3d kol trimestre. El tawarekh t3aref 3lihom fel application."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "9addech tdum les examens?",
+    "answer": "Waqt el examen ykhtalef 7asb el madda, 3adatan bin sa3a w sa3tiin."
+  },
+  {
+    "category": "Discipline",
+    "question": "Ynejmo el talaba ya3mlo appel 3la 9arar ta'diibi?",
+    "answer": "Ih, el talaba wella el waldeen ynejmo yatlbo ijtima3 m3a el administration."
+  },
+  {
+    "category": "Discipline",
+    "question": "Chneya el tasarrufet elli mamnou3a?",
+    "answer": "Bullying, 9ellet adab, cheating, w taksir mamnouiin."
+  },
+  {
+    "category": "Discipline",
+    "question": "Kifech yethal el nizaa3et fel l'école?",
+    "answer": "L'école tetba3 politique mta3 hal el nizaa3et bil profs w psychologues."
+  },
+  {
+    "category": "Discipline",
+    "question": "Ynejmo el talaba yeb3tho rapport 3al bullying?",
+    "answer": "Ih, el talaba ynejmo yeb3tho rapport anonyme 3al application wella yahkiw m3a psychologue."
+  },
+  {
+    "category": "Discipline",
+    "question": "Famma sa3at detention?",
+    "answer": "Ih, el detention yssir el Jom3a ba3d el dohor lel mkhelfet ta'diibiyya."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Kifech el waldeen ystalmou tenbiihet urgentes?",
+    "answer": "El tenbiihet urgentes yeb3thouhom bil SMS w notifications fel application."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "El waldeen ynejmo yjiw lel activités mta3 l'école?",
+    "answer": "Ih, el waldeen yenjmou yjiw lel activités public mta3 l'école."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Kifech nattatawa3 lel activités mta3 l'école?",
+    "answer": "Esta3mel el 'Get Involved' fel application wella contacti secrétaire mta3 l'école."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "9addech marrat fel 3am yet3ata carnet?",
+    "answer": "El carnet yet3ata tleth marrat fel 3am, marra fel trimestre."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Nnajem ndownloadi el carnet mta3 wleddi?",
+    "answer": "Ih, el carnets mawjoudin lel download fel partie mta3 waldeen fel application."
+  },
+  {
+    "category": "Technical Support",
+    "question": "Kifech nbaddel loghet el application?",
+    "answer": "Emchi lel paramètres w ekhtar el logha elli t7eb."
+  },
+  {
+    "category": "Technical Support",
+    "question": "Chneya el téléphones elli ysupportiw el application?",
+    "answer": "El application tekhdem 3la Android 8+ w iOS 12+."
+  },
+  {
+    "category": "Technical Support",
+    "question": "3leh el notifications ma yjiwnich?",
+    "answer": "Te'aked elli el notifications activés fel paramètres mta3 el telephone w permissions mta3 el application."
+  },
+  {
+    "category": "Technical Support",
+    "question": "Kifech nsynchronisi el données ken mel3ouba?",
+    "answer": "El application tsynchronisi automatiquement ki tkoun mwassel bil internet."
+  },
+  {
+    "category": "Technical Support",
+    "question": "Kifech n3ati feedback 3al application?",
+    "answer": "Esta3mel el 'Feedback' fel menu mta3 paramètres."
+  },
+  {
+    "category": "Other",
+    "question": "Famma 'lost and found'?",
+    "answer": "Ih, mawjoud 3and reception fel bureau administration."
+  },
+  {
+    "category": "Other",
+    "question": "Famma cantine fel l'école?",
+    "answer": "Ih, el cantine mafto7a kol nhar men 10:00 sbah lel 2:00 dhuhur."
+  },
+  {
+    "category": "Other",
+    "question": "El talaba ynejmo yjiibo laptops mte3hom?",
+    "answer": "Ih, ama lazem yetba3o el politique mta3 l'école lel appareils numériques."
+  },
+  {
+    "category": "Other",
+    "question": "Famma 9raya à distance?",
+    "answer": "Ih, el 9raya à distance tnajem tetbramej fel cas-et khas wella urgence."
+  },
+  {
+    "category": "Other",
+    "question": "Kifech yetbarmjo les activités extrascolaires?",
+    "answer": "Yetha3lno 3lihom kol jemaa fel calendrier mta3 el application w tableau mta3 l'école."
+  },
+  {
+    "category": "General Info",
+    "question": "How can I contact the school?",
+    "answer": "You can contact the school by phone at +216 71 123 456 or by email at contact@ecole.tn."
+  },
+  {
+    "category": "Student Services",
+    "question": "How to reset student passwords?",
+    "answer": "Visit the IT office or use the 'Forgot Password' link in the app."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "When does the school year start?",
+    "answer": "The school year starts in mid-September."
+  },
+  {
+    "category": "Discipline",
+    "question": "Can students be expelled?",
+    "answer": "Yes, for repeated violations or serious offenses."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "How to receive school updates?",
+    "answer": "Updates are sent via the app notification system and email."
+  },
+  {
+    "category": "Technical Support",
+    "question": "I can't log in, what should I do?",
+    "answer": "Ensure you're using the correct credentials. If not, reset your password."
+  },
+  {
+    "category": "General Info",
+    "question": "Who is the school principal?",
+    "answer": "The school principal is Mr. Mohamed Ben Salah."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "How can I find my class schedule?",
+    "answer": "Class schedules are posted in the app and on classroom boards."
+  },
+  {
+    "category": "Discipline",
+    "question": "What are the school rules?",
+    "answer": "Rules include respecting teachers, no phones in class, and being on time."
+  },
+  {
+    "category": "Technical Support",
+    "question": "How to update the school app?",
+    "answer": "Go to the App Store or Play Store and tap 'Update' on the app page."
+  },
+  {
+    "category": "General Info",
+    "question": "What are the school hours?",
+    "answer": "The school is open from 8:00 AM to 4:00 PM, Monday to Friday."
+  },
+  {
+    "category": "Discipline",
+    "question": "What is the penalty for cheating?",
+    "answer": "Cheating results in a warning, zero grade, and parent notification."
+  },
+  {
+    "category": "General Info",
+    "question": "Where is the school located?",
+    "answer": "The school is located in downtown Tunis, near Place Pasteur."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "What are the school holidays?",
+    "answer": "The school follows the official Tunisian holiday calendar."
+  },
+  {
+    "category": "Discipline",
+    "question": "How is attendance monitored?",
+    "answer": "Teachers take attendance daily and report absences to the administration."
+  },
+  {
+    "category": "Technical Support",
+    "question": "The app isn’t working, what should I do?",
+    "answer": "Restart your device and check for app updates or contact tech support."
+  },
+  {
+    "category": "Student Services",
+    "question": "How can students report an absence?",
+    "answer": "Students must provide a signed note from parents and inform their teacher."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Can parents access lunch menus?",
+    "answer": "Yes, the cafeteria menu is published weekly in the app."
+  },
+  {
+    "category": "Technical Support",
+    "question": "I forgot my username, how can I recover it?",
+    "answer": "Visit the school IT office or click 'Forgot Username' on the app."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "When is the next exam?",
+    "answer": "Exam schedules are available in the app under the 'Exams' tab."
+  },
+  {
+    "category": "Student Services",
+    "question": "How to check student grades?",
+    "answer": "Grades can be viewed through the parent portal in the app."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "How can parents contact teachers?",
+    "answer": "Parents can message teachers via the app or schedule a meeting."
+  },
+  {
+    "category": "Student Services",
+    "question": "What happens if a student is late?",
+    "answer": "Late students must sign in at the front desk and may face disciplinary action."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Can parents view homework?",
+    "answer": "Yes, homework is listed in the app under each subject."
+  },
+  {
+    "category": "General Info",
+    "question": "Is there a school map available?",
+    "answer": "Yes, a map of the school is available in the app under the 'Info' section."
+  },
+  {
+    "category": "General Info",
+    "question": "Does the school offer transportation?",
+    "answer": "Yes, school buses are available. You can check routes and schedules in the app."
+  },
+  {
+    "category": "Student Services",
+    "question": "How to apply for a school certificate?",
+    "answer": "You can request a certificate via the app or by visiting the admin office."
+  },
+  {
+    "category": "Student Services",
+    "question": "How to request a tutoring session?",
+    "answer": "Speak to your teacher or request through the app's 'Help' section."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "What is the exam grading policy?",
+    "answer": "Each exam is graded out of 20. The average determines the final grade."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Can students retake exams?",
+    "answer": "Yes, retakes are allowed for justified absences or low grades, upon approval."
+  },
+  {
+    "category": "Discipline",
+    "question": "How are students disciplined for tardiness?",
+    "answer": "Repeated tardiness may result in warnings, parent contact, or detention."
+  },
+  {
+    "category": "Discipline",
+    "question": "Are phones allowed in class?",
+    "answer": "No, phones must be turned off and stored away during class."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "How can parents schedule a meeting with the principal?",
+    "answer": "Parents can schedule a meeting through the app or call the school office."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Can both parents access the app?",
+    "answer": "Yes, both parents can create accounts using the student ID."
+  },
+  {
+    "category": "Technical Support",
+    "question": "The app crashes when I open it, what should I do?",
+    "answer": "Clear the app cache and restart your phone. If the issue continues, contact support."
+  },
+  {
+    "category": "Technical Support",
+    "question": "How to report a bug in the app?",
+    "answer": "Use the 'Report a Problem' feature in the app settings or contact tech support."
+  },
+  {
+    "category": "General Info",
+    "question": "Is there a school newsletter?",
+    "answer": "Yes, monthly newsletters are sent via email and available in the app."
+  },
+  {
+    "category": "General Info",
+    "question": "Are there school tours for new students?",
+    "answer": "Yes, school tours are held at the beginning of each semester."
+  },
+  {
+    "category": "General Info",
+    "question": "What languages are taught?",
+    "answer": "The school teaches Arabic, French, and English."
+  },
+  {
+    "category": "General Info",
+    "question": "Is there a dress code?",
+    "answer": "Yes, students must wear appropriate school uniforms from Monday to Thursday."
+  },
+  {
+    "category": "General Info",
+    "question": "Does the school offer extracurricular activities?",
+    "answer": "Yes, clubs include robotics, theater, sports, and music."
+  },
+  {
+    "category": "Student Services",
+    "question": "Can students change classes?",
+    "answer": "Class changes require parent approval and administrative validation."
+  },
+  {
+    "category": "Student Services",
+    "question": "How to request a transcript?",
+    "answer": "Transcripts can be requested from the administration office or through the app."
+  },
+  {
+    "category": "Student Services",
+    "question": "Is there psychological support available?",
+    "answer": "Yes, the school has a counselor available by appointment."
+  },
+  {
+    "category": "Student Services",
+    "question": "How to apply for financial aid?",
+    "answer": "Visit the school office with required documents to apply for aid."
+  },
+  {
+    "category": "Student Services",
+    "question": "Can students use the library after school?",
+    "answer": "Yes, the library is open until 5:30 PM on weekdays."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "How to prepare for final exams?",
+    "answer": "Teachers provide revision sessions and materials through the app."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Where can I find exam results?",
+    "answer": "Results are published in the app under 'Grades'."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "Are midterm exams mandatory?",
+    "answer": "Yes, midterms are a key part of student assessment."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "When are parent-teacher meetings scheduled?",
+    "answer": "Meetings occur after each trimester. Dates are announced via the app."
+  },
+  {
+    "category": "Timetable & Exams",
+    "question": "How long do exams last?",
+    "answer": "Exam durations vary by subject, typically between 1 and 2 hours."
+  },
+  {
+    "category": "Discipline",
+    "question": "Can students appeal a disciplinary decision?",
+    "answer": "Yes, students or parents can request a meeting with administration."
+  },
+  {
+    "category": "Discipline",
+    "question": "What behavior is considered unacceptable?",
+    "answer": "Bullying, disrespect, cheating, and vandalism are not tolerated."
+  },
+  {
+    "category": "Discipline",
+    "question": "How are conflicts handled at school?",
+    "answer": "The school follows a conflict resolution policy involving teachers and counselors."
+  },
+  {
+    "category": "Discipline",
+    "question": "Can students report bullying?",
+    "answer": "Yes, students can report anonymously via the app or speak to a counselor."
+  },
+  {
+    "category": "Discipline",
+    "question": "Are there detention hours?",
+    "answer": "Yes, detention is held on Friday afternoons for disciplinary infractions."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "How can parents receive emergency notifications?",
+    "answer": "Emergency alerts are sent via SMS and push notifications in the app."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Can parents attend school events?",
+    "answer": "Yes, parents are welcome at all public school events."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "How to volunteer for school activities?",
+    "answer": "Use the app’s 'Get Involved' section or contact the school secretary."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "How often are report cards issued?",
+    "answer": "Report cards are issued three times per year, once per trimester."
+  },
+  {
+    "category": "Parent Questions",
+    "question": "Can I download my child’s report card?",
+    "answer": "Yes, report cards are available for download in the parent section of the app."
+  },
+  {
+    "category": "Technical Support",
+    "question": "How to change the app language?",
+    "answer": "Go to settings and choose your preferred language."
+  },
+  {
+    "category": "Technical Support",
+    "question": "What devices support the app?",
+    "answer": "The app is supported on Android 8+ and iOS 12+."
+  },
+  {
+    "category": "Technical Support",
+    "question": "Why are notifications not showing?",
+    "answer": "Ensure notifications are enabled in your phone settings and app permissions."
+  },
+  {
+    "category": "Technical Support",
+    "question": "How to sync data if offline?",
+    "answer": "The app syncs automatically once connected to the internet."
+  },
+  {
+    "category": "Technical Support",
+    "question": "How can I give feedback on the app?",
+    "answer": "Use the 'Feedback' option in the settings menu."
+  },
+  {
+    "category": "Other",
+    "question": "Is there a lost and found?",
+    "answer": "Yes, it’s located at the admin office reception desk."
+  },
+  {
+    "category": "Other",
+    "question": "Is there a canteen in the school?",
+    "answer": "Yes, the canteen is open daily from 10:00 AM to 2:00 PM."
+  },
+  {
+    "category": "Other",
+    "question": "Can students bring their own laptops?",
+    "answer": "Yes, but they must follow the school’s digital device policy."
+  },
+  {
+    "category": "Other",
+    "question": "Is remote learning available?",
+    "answer": "Yes, remote classes can be scheduled in special cases or emergencies."
+  },
+  {
+    "category": "Other",
+    "question": "How are extracurricular activities scheduled?",
+    "answer": "They’re announced weekly on the app calendar and school board."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "Comment puis-je contacter l'école ?",
+    "answer": "Vous pouvez contacter l'école par téléphone au +216 71 123 456 ou par email à contact@ecole.tn."
+  },
+  {
+    "category": "Services aux Étudiants",
+    "question": "Comment réinitialiser les mots de passe des élèves ?",
+    "answer": "Visitez le bureau informatique ou utilisez le lien 'Mot de passe oublié' dans l'application."
+  },
+  {
+    "category": "Emploi du temps & Examens",
+    "question": "Quand commence l'année scolaire ?",
+    "answer": "L'année scolaire commence à la mi-septembre."
+  },
+  {
+    "category": "Questions des Parents",
+    "question": "Comment recevoir les mises à jour de l'école ?",
+    "answer": "Les mises à jour sont envoyées via le système de notification de l'application et par email."
+  },
+  {
+    "category": "Support Technique",
+    "question": "Je ne peux pas me connecter, que dois-je faire ?",
+    "answer": "Assurez-vous d'utiliser les bonnes informations d'identification. Si non, réinitialisez votre mot de passe."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "Qui est le directeur de l'école ?",
+    "answer": "Le directeur de l'école est M. Mohamed Ben Salah."
+  },
+  {
+    "category": "Emploi du temps & Examens",
+    "question": "Comment puis-je trouver mon emploi du temps ?",
+    "answer": "Les emplois du temps sont affichés dans l'application et sur les tableaux des salles de classe."
+  },
+  {
+    "category": "Discipline",
+    "question": "Quelles sont les règles de l'école ?",
+    "answer": "Les règles comprennent le respect des enseignants, pas de téléphones en classe et être à l'heure."
+  },
+  {
+    "category": "Support Technique",
+    "question": "Comment mettre à jour l'application de l'école ?",
+    "answer": "Allez sur l'App Store ou le Play Store et appuyez sur 'Mettre à jour' sur la page de l'application."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "Quelles sont les heures d'école ?",
+    "answer": "L'école est ouverte de 8h00 à 16h00, du lundi au vendredi."
+  },
+  {
+    "category": "Discipline",
+    "question": "Quelle est la sanction pour la triche ?",
+    "answer": "La triche entraîne un avertissement, une note zéro et une notification aux parents."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "Où se situe l'école ?",
+    "answer": "L'école est située au centre-ville de Tunis, près de la Place Pasteur."
+  },
+  {
+    "category": "Emploi du temps & Examens",
+    "question": "Quelles sont les vacances scolaires ?",
+    "answer": "L'école suit le calendrier officiel des vacances tunisiennes."
+  },
+  {
+    "category": "Discipline",
+    "question": "Comment la présence est-elle surveillée ?",
+    "answer": "Les enseignants prennent les présences quotidiennement et signalent les absences à l'administration."
+  },
+  {
+    "category": "Support Technique",
+    "question": "L'application ne fonctionne pas, que dois-je faire ?",
+    "answer": "Redémarrez votre appareil et vérifiez les mises à jour de l'application ou contactez le support technique."
+  },
+  {
+    "category": "Support Technique",
+    "question": "J'ai oublié mon nom d'utilisateur, comment puis-je le récupérer ?",
+    "answer": "Visitez le bureau informatique de l'école ou cliquez sur 'Nom d'utilisateur oublié' sur l'application."
+  },
+  {
+    "category": "Emploi du temps & Examens",
+    "question": "Quand est le prochain examen ?",
+    "answer": "Les calendriers d'examens sont disponibles dans l'application sous l'onglet 'Examens'."
+  },
+  {
+    "category": "Services aux Étudiants",
+    "question": "Comment vérifier les notes des élèves ?",
+    "answer": "Les notes peuvent être consultées via le portail parent dans l'application."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "Y a-t-il un plan de l'école disponible ?",
+    "answer": "Oui, un plan de l'école est disponible dans l'application sous la section 'Info'."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "L'école offre-t-elle des transports ?",
+    "answer": "Oui, des bus scolaires sont disponibles. Vous pouvez vérifier les itinéraires et les horaires dans l'application."
+  },
+  {
+    "category": "Services aux Étudiants",
+    "question": "Comment demander un certificat scolaire ?",
+    "answer": "Vous pouvez demander un certificat via l'application ou en visitant le bureau administratif."
+  },
+  {
+    "category": "Services aux Étudiants",
+    "question": "Comment demander une session de tutorat ?",
+    "answer": "Parlez à votre enseignant ou faites une demande via la section 'Aide' de l'application."
+  },
+  {
+    "category": "Emploi du temps & Examens",
+    "question": "Quelle est la politique de notation des examens ?",
+    "answer": "Chaque examen est noté sur 20. La moyenne détermine la note finale."
+  },
+  {
+    "category": "Discipline",
+    "question": "Comment les élèves sont-ils disciplinés pour les retards ?",
+    "answer": "Des retards répétés peuvent entraîner des avertissements, un contact avec les parents ou une retenue."
+  },
+  {
+    "category": "Discipline",
+    "question": "Les téléphones sont-ils autorisés en classe ?",
+    "answer": "Non, les téléphones doivent être éteints et rangés pendant les cours."
+  },
+  {
+    "category": "Support Technique",
+    "question": "L'application plante quand je l'ouvre, que dois-je faire ?",
+    "answer": "Videz le cache de l'application et redémarrez votre téléphone. Si le problème persiste, contactez le support."
+  },
+  {
+    "category": "Support Technique",
+    "question": "Comment signaler un bug dans l'application ?",
+    "answer": "Utilisez la fonction 'Signaler un problème' dans les paramètres de l'application ou contactez le support technique."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "Y a-t-il une newsletter de l'école ?",
+    "answer": "Oui, des bulletins d'information mensuels sont envoyés par email et disponibles dans l'application."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "Y a-t-il des visites d'école pour les nouveaux élèves ?",
+    "answer": "Oui, des visites d'école sont organisées au début de chaque semestre."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "Quelles langues sont enseignées ?",
+    "answer": "L'école enseigne l'arabe, le français et l'anglais."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "Y a-t-il un code vestimentaire ?",
+    "answer": "Oui, les élèves doivent porter des uniformes scolaires appropriés du lundi au jeudi."
+  },
+  {
+    "category": "Informations Générales",
+    "question": "L'école propose-t-elle des activités extrascolaires ?",
+    "answer": "Oui, les clubs comprennent la robotique, le théâtre, les sports et la musique."
+  },
+  {
+    "category": "Services aux Étudiants",
+    "question": "Comment demander un relevé de notes ?",
+    "answer": "Les relevés de notes peuvent être demandés au bureau d'administration ou via l'application."
+  },
+  {
+    "category": "Services aux Étudiants",
+    "question": "Y a-t-il un soutien psychologique disponible ?",
+    "answer": "Oui, l'école dispose d'un conseiller disponible sur rendez-vous."
+  },
+  {
+    "category": "Services aux Étudiants",
+    "question": "Comment demander une aide financière ?",
+    "answer": "Visitez le bureau de l'école avec les documents requis pour demander une aide."
+  },
+  {
+    "category": "Emploi du temps & Examens",
+    "question": "Comment se préparer aux examens finaux ?",
+    "answer": "Les enseignants fournissent des sessions de révision et du matériel via l'application."
+  },
+  {
+    "category": "Emploi du temps & Examens",
+    "question": "Où puis-je trouver les résultats des examens ?",
+    "answer": "Les résultats sont publiés dans l'application sous 'Notes'."
+  },
+  {
+    "category": "Emploi du temps & Examens",
+    "question": "Les examens de mi-trimestre sont-ils obligatoires ?",
+    "answer": "Oui, les examens de mi-trimestre sont une partie essentielle de l'évaluation des élèves."
+  },
+  {
+    "category": "Emploi du temps & Examens",
+    "question": "Quand sont programmées les réunions parents-enseignants ?",
+    "answer": "Les réunions ont lieu après chaque trimestre. Les dates sont annoncées via l'application."
+  },
+  {
+    "category": "Emploi du temps & Examens",
+    "question": "Combien de temps durent les examens ?",
+    "answer": "La durée des examens varie selon les matières, généralement entre 1 et 2 heures."
+  },
+  {
+    "category": "Discipline",
+    "question": "Quel comportement est considéré comme inacceptable ?",
+    "answer": "L'intimidation, le manque de respect, la triche et le vandalisme ne sont pas tolérés."
+  },
+  {
+    "category": "Discipline",
+    "question": "Comment les conflits sont-ils gérés à l'école ?",
+    "answer": "L'école suit une politique de résolution des conflits impliquant les enseignants et les conseillers."
+  },
+  {
+    "category": "Discipline",
+    "question": "Y a-t-il des heures de retenue ?",
+    "answer": "Oui, la retenue a lieu le vendredi après-midi pour les infractions disciplinaires."
+  },
+  {
+    "category": "Questions des Parents",
+    "question": "Comment se porter volontaire pour les activités scolaires ?",
+    "answer": "Utilisez la section 'Impliquez-vous' de l'application ou contactez le secrétariat de l'école."
+  },
+  {
+    "category": "Questions des Parents",
+    "question": "À quelle fréquence les bulletins scolaires sont-ils émis ?",
+    "answer": "Les bulletins scolaires sont émis trois fois par an, une fois par trimestre."
+  },
+  {
+    "category": "Questions des Parents",
+    "question": "Puis-je télécharger le bulletin scolaire de mon enfant ?",
+    "answer": "Oui, les bulletins scolaires sont disponibles au téléchargement dans la section parent de l'application."
+  },
+  {
+    "category": "Support Technique",
+    "question": "Comment changer la langue de l'application ?",
+    "answer": "Allez dans les paramètres et choisissez votre langue préférée."
+  },
+  {
+    "category": "Support Technique",
+    "question": "Quels appareils prennent en charge l'application ?",
+    "answer": "L'application est compatible avec Android 8+ et iOS 12+."
+  },
+  {
+    "category": "Support Technique",
+    "question": "Pourquoi les notifications ne s'affichent-elles pas ?",
+    "answer": "Assurez-vous que les notifications sont activées dans les paramètres de votre téléphone et les autorisations de l'application."
+  },
+  {
+    "category": "Support Technique",
+    "question": "Comment synchroniser les données hors ligne ?",
+    "answer": "L'application se synchronise automatiquement une fois connectée à Internet."
+  },
+  {
+    "category": "Support Technique",
+    "question": "Comment puis-je donner mon avis sur l'application ?",
+    "answer": "Utilisez l'option 'Commentaires' dans le menu des paramètres."
+  },
+  {
+    "category": "Autre",
+    "question": "Y a-t-il un service des objets trouvés ?",
+    "answer": "Oui, il est situé à la réception du bureau administratif."
+  },
+  {
+    "category": "Autre",
+    "question": "Y a-t-il une cantine dans l'école ?",
+    "answer": "Oui, la cantine est ouverte tous les jours de 10h00 à 14h00."
+  },
+  {
+    "category": "Autre",
+    "question": "L'apprentissage à distance est-il disponible ?",
+    "answer": "Oui, des cours à distance peuvent être programmés dans des cas spéciaux ou des urgences."
+  },
+  {
+    "category": "Autre",
+    "question": "Comment les activités extrascolaires sont-elles programmées ?",
+    "answer": "Elles sont annoncées chaque semaine sur le calendrier de l'application et le tableau d'affichage de l'école."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "كيفاش نجم نتصل بالمدرسة؟",
+    "answer": "تنجم تتصل بالمدرسة بالتلفون على +216 71 123 456 ولا تبعث إيميل على contact@ecole.tn."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "شنوة توقيت المدرسة؟",
+    "answer": "المدرسة محلولة من 8:00 صباحًا حتى 4:00 مساءً، من الاثنين للجمعة."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "وين موجودة المدرسة؟",
+    "answer": "المدرسة موجودة في وسط العاصمة تونس، قريب من بلاصة باستور."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "شكون المدير؟",
+    "answer": "المدير هو السيد محمد بن صالح."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "فما خريطة للمدرسة؟",
+    "answer": "إي، الخريطة موجودة في التطبيق تحت قسم 'المعلومات'."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "المدرسة توفر نقل؟",
+    "answer": "إي، فما حافلات مدرسية. تنجم تشوف الطرق والتوقيت في التطبيق."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "فما نشرة إخبارية؟",
+    "answer": "إي، كل شهر تبعث النشرة عبر الإيميل وموجودة في التطبيق."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "فما جولات للتلامذة الجدد؟",
+    "answer": "إي، الجولات تصير في بداية كل سداسي."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "شنوة اللغات اللي تتقرى؟",
+    "answer": "نتعلموا العربية، الفرنسية، والإنجليزية."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "فما لباس موحد؟",
+    "answer": "إي، لازم التلامذة يلبسوا الزي المدرسي من الاثنين للخميس."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "فما أنشطة خارجية؟",
+    "answer": "إي، عنا نوادي كيما الروبوتيك، المسرح، الرياضة، والموسيقى."
+  },
+  {
+    "category": "الدعم التقني",
+    "question": "كيفاش نبدل كلمة السر؟",
+    "answer": "تنجم تمشي لمكتب الإعلامية و تستعمل رابط 'نسيت كلمة السر' في التطبيق."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيفاش نطلب شهادة مدرسية؟",
+    "answer": "تنجم تطلبها من التطبيق ولا تمشي لمكتب الإدارة."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيفاش نطلب حصة دعم؟",
+    "answer": "احكي مع الأستاذ ولا استعمل قسم 'المساعدة' في التطبيق."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيفاش نبلغ على غياب؟",
+    "answer": "لازم تجيب ورقة ممضاة من الوالدين وتعلم الأستاذ."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "ينجم التلميذ يبدل القسم؟",
+    "answer": "التبديل يلزم موافقة الوالدين ومصادقة الإدارة."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيفاش نطلب كشف النقاط؟",
+    "answer": "تنجم تطلبه من مكتب الإدارة ولا عبر التطبيق."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "فما دعم نفسي؟",
+    "answer": "إي، عنا مستشار نفسي ينجم يقابلك بموعد."
+  },
+  {
+    "category": "خدمات الطلاب",
+    "question": "كيفاش نطلب مساعدة مالية؟",
+    "answer": "امشي لمكتب الإدارة ومعاك الوثائق اللازمة."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "المكتبة محلولة بعد القراية؟",
+    "answer": "إي، المكتبة محلولة حتى 5:30 مساءً في أيام الأسبوع."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "وقتاش تبدا السنة الدراسية؟",
+    "answer": "السنة تبدا في وسط سبتمبر."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "كيفاش نلقى جدول القراية؟",
+    "answer": "الجدول موجود في التطبيق وعلى السبورة في القسم."
+  },
+  {
+    "category": "معلومات عامة",
+    "question": "شنوة العطل المدرسية؟",
+    "answer": "نتبعوا الرزنامة الرسمية للعطل في تونس."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "وقتاش الفروض؟",
+    "answer": "رزنامة الفروض موجودة في التطبيق تحت قسم 'الفروض'."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "كيفاش نلقى نتائج الفروض؟",
+    "answer": "النتائج تنشر في التطبيق تحت قسم 'النقاط'."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "فما مراجعة قبل الفروض؟",
+    "answer": "إي، الأساتذة يوفروا جلسات مراجعة ومواد عبر التطبيق."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "فما إعادة للفروض؟",
+    "answer": "إي، تنجم تعاود الفرض إذا كان عندك غياب مبرر ولا نقطة ضعيفة، بعد الموافقة."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "الفروض تدوم قداش؟",
+    "answer": "المدة تختلف حسب المادة، عادة بين ساعة وساعتين."
+  },
+  {
+    "category": "الجدول الزمني والامتحانات",
+    "question": "الفروض الوسطية إلزامية؟",
+    "answer": "إي، الفروض الوسطية جزء مهم من التقييم."
+  }
+]

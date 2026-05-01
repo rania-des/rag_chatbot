@@ -241,67 +241,72 @@ def health() -> Dict[str, str]:
 # ================================================
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest) -> ChatResponse:
-    # ── Résolution automatique profile_id → student_id ──────────────────
-    # Le front-end envoie parfois user.id (= auth.users.id = profile_id)
-    # au lieu du students.id. On résout automatiquement.
-    student_id = resolve_student_id(req.student_id)
-    if student_id != req.student_id:
-        print(f"[chat] Résolution : {req.student_id[:8]}… → {student_id[:8]}… (profile_id → student_id)")
 
+    # ── Résolution automatique profile_id → student_id ──────────────────
+    student_id = resolve_student_id(req.student_id)
     StudentContext.set(student_id=student_id, class_id=req.class_id)
 
     try:
-        # 1. Gérer la conversation (créer ou récupérer)
-        is_new_conversation = False
-        if req.conversation_id:
-            conversation_id = req.conversation_id
-            history = rebuild_history_from_db(
-                conversation_id, student_id, max_messages=settings.MAX_HISTORY_MESSAGES
-            )
-            conversation_title = None
-        else:
-            # Nouvelle conversation
-            conv = create_conversation(student_id, first_question=req.message)
-            if not conv:
-                raise HTTPException(status_code=500, detail="Impossible de créer la conversation.")
-            conversation_id = conv["id"]
-            conversation_title = conv["title"]
-            history = []
-            is_new_conversation = True
-
-        # 2. Sauvegarder le message utilisateur
-        save_message(conversation_id, role="user", content=req.message)
-
-        # 3. Router + dispatcher
         router = get_router()
         route, faq_doc, score = router.route(req.message, course_id=req.course_id)
 
+        # ════════════════════════════════════════════════════════════
+        # GREET — réponse instantanée, 0 appel Supabase, 0 appel LLM
+        # ════════════════════════════════════════════════════════════
+        if route == Route.GREET:
+            print("[chat] 👋 GREET")
+            return ChatResponse(
+                answer=get_greet_response(req.message),
+                route=Route.GREET.value,
+                conversation_id=req.conversation_id or "",
+                conversation_title="",
+                faq_score=None, sources=None, citations=None,
+            )
+
+        # ════════════════════════════════════════════════════════════
+        # Toutes les autres routes → gestion de la conversation
+        # ════════════════════════════════════════════════════════════
+        is_new = False
+        if req.conversation_id:
+            conversation_id    = req.conversation_id
+            conversation_title = None
+            history = rebuild_history_from_db(
+                conversation_id, student_id,
+                max_messages=settings.MAX_HISTORY_MESSAGES,
+            )
+        else:
+            conv = create_conversation(student_id, first_question=req.message)
+            if not conv:
+                raise HTTPException(status_code=500,
+                                    detail="Impossible de créer la conversation.")
+            conversation_id    = conv["id"]
+            conversation_title = conv["title"]
+            history            = []
+            is_new             = True
+
+        # Sauvegarder le message utilisateur
+        save_message(conversation_id, role="user", content=req.message)
+
+        # ── Dispatch ────────────────────────────────────────────────
         citations_data = None
 
-        if route == Route.GREET:
-            # Salutation instantanée — 0 appel LLM
-            answer = get_greet_response(req.message)
-            sources = None
-            citations = None
-
-        elif route == Route.FAQ and faq_doc is not None:
+        if route == Route.FAQ and faq_doc is not None:
             formatter = get_faq_formatter()
             answer = formatter.format(
                 user_question=req.message,
                 reference_answer=faq_doc.metadata["answer"],
             )
             sources = [{
-                "category": faq_doc.metadata.get("category"),
+                "category":         faq_doc.metadata.get("category"),
                 "matched_question": faq_doc.metadata.get("original_question"),
-                "similarity": round(score, 3),
+                "similarity":       round(score, 3),
             }]
             citations = None
 
         elif route == Route.COURSE:
             if not req.course_id:
-                raise HTTPException(
-                    status_code=400, detail="course_id requis pour la branche COURSE."
-                )
+                raise HTTPException(status_code=400,
+                                    detail="course_id requis pour la branche COURSE.")
             engine = get_course_engine()
             try:
                 result = engine.answer_question(
@@ -311,8 +316,8 @@ def chat(req: ChatRequest) -> ChatResponse:
                 )
             except ValueError as e:
                 raise HTTPException(status_code=404, detail=str(e)) from e
-            answer = result.answer
-            sources = None
+            answer    = result.answer
+            sources   = None
             citations = [
                 CitationOut(filename=c.filename, page=c.page, excerpt=c.excerpt)
                 for c in result.citations
@@ -325,10 +330,10 @@ def chat(req: ChatRequest) -> ChatResponse:
         else:  # DYNAMIC
             engine = get_dynamic_engine()
             answer = engine.answer(req.message, history=history)
-            sources = None
+            sources   = None
             citations = None
 
-        # 4. Sauvegarder la réponse
+        # ── Sauvegarder la réponse ──────────────────────────────────
         save_message(
             conversation_id,
             role="assistant",
@@ -337,14 +342,14 @@ def chat(req: ChatRequest) -> ChatResponse:
             citations=citations_data,
         )
 
-        # 5. Si c'est une nouvelle conversation, générer un titre après le 1er échange
-        if is_new_conversation:
+        # ── Générer le titre si nouvelle conversation ────────────────
+        if is_new:
             try:
                 title = generate_title(req.message, answer)
                 update_title(conversation_id, student_id, title)
                 conversation_title = title
             except Exception as e:
-                print(f"[chat] Échec génération titre : {e}")
+                print(f"[chat] Titre non généré : {e}")
 
         return ChatResponse(
             answer=answer,
@@ -359,10 +364,8 @@ def chat(req: ChatRequest) -> ChatResponse:
     except HTTPException:
         raise
     except Exception as e:
-        import traceback as tb
         print(f"[chat] ❌ ERREUR — {type(e).__name__}: {e}")
-        tb.print_exc()
-        raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {e}") from e
+        raise HTTPException(status_code=500, detail=f"Erreur interne : {e}") from e
     finally:
         StudentContext.clear()
 

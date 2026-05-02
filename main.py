@@ -15,18 +15,23 @@ Endpoints :
   DELETE /conversations/{id}             — supprime une conversation
   POST   /reindex                        — reconstruit l'index FAQ
   GET    /health                         — healthcheck
+  GET    /student/agenda                 — planning de révision
+  POST   /courses/fiche                  — génère une fiche de révision (JSON)
+  POST   /courses/fiche/pdf              — génère une fiche de révision (PDF)
 
 Exécution :
-    uvicorn main:app --reload --port 8000
+    uvicorn main:app --reload --port 8000 --host 0.0.0.0
 """
 from __future__ import annotations
 
+import asyncio
 import os
 import tempfile
 from typing import Dict, List, Optional
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 from config import settings
@@ -50,7 +55,10 @@ from engine import (
     get_router,
 )
 from engine.router import get_greet_response
+from engine.agenda_engine import generate_weekly_agenda
+from engine.fiche_engine import generate_fiche, generate_fiche_pdf
 from ingestion import get_course_store, ingest_course
+from memory import get_student_memory, update_student_memory
 from tools import StudentContext
 from tools.supabase_tools import get_supabase
 
@@ -179,6 +187,17 @@ class RenameRequest(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
 
 
+class FicheRequest(BaseModel):
+    student_id: str
+    course_id: str
+    difficulty: str = "medium"
+
+
+# Stockage temporaire des cours uploadés pour la génération de fiches
+# Structure: {course_id: {"text": str, "filename": str, "student_id": str}}
+_active_courses: Dict[str, dict] = {}
+
+
 # ================================================
 # FastAPI app
 # ================================================
@@ -188,12 +207,21 @@ app = FastAPI(
     version="4.0.0",
 )
 
+# Configuration CORS améliorée pour supporter l'upload de fichiers
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # À restreindre en prod
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 
@@ -240,15 +268,22 @@ def health() -> Dict[str, str]:
 # ENDPOINT PRINCIPAL : /chat
 # ================================================
 @app.post("/chat", response_model=ChatResponse)
-def chat(req: ChatRequest) -> ChatResponse:
+async def chat(req: ChatRequest) -> ChatResponse:
 
     # ── Résolution automatique profile_id → student_id ──────────────────
     student_id = resolve_student_id(req.student_id)
     StudentContext.set(student_id=student_id, class_id=req.class_id)
 
     try:
+        # ── Récupérer le profil mémoire de l'élève ──────────────────────
+        memory_profile = await get_student_memory(student_id)
+
         router = get_router()
-        route, faq_doc, score = router.route(req.message, course_id=req.course_id)
+        route, faq_doc, score = router.route(
+            query=req.message,
+            course_id=req.course_id,
+            memory_profile=memory_profile,
+        )
 
         # ════════════════════════════════════════════════════════════
         # GREET — réponse instantanée, 0 appel Supabase, 0 appel LLM
@@ -329,7 +364,11 @@ def chat(req: ChatRequest) -> ChatResponse:
 
         else:  # DYNAMIC
             engine = get_dynamic_engine()
-            answer = engine.answer(req.message, history=history)
+            answer = engine.answer(
+                query=req.message,
+                history=history,
+                memory_profile=memory_profile,
+            )
             sources   = None
             citations = None
 
@@ -341,6 +380,16 @@ def chat(req: ChatRequest) -> ChatResponse:
             route=route.value,
             citations=citations_data,
         )
+
+        # ── Mise à jour mémoire asynchrone (ne bloque pas la réponse) ──
+        if route.value in ("DYNAMIC", "COURSE", "FAQ"):
+            asyncio.create_task(update_student_memory(
+                student_id=student_id,
+                topic=req.message[:80],
+                difficulty="medium",
+                tone="casual",
+                note=answer[:300]
+            ))
 
         # ── Générer le titre si nouvelle conversation ────────────────
         if is_new:
@@ -393,11 +442,8 @@ def get_messages(conversation_id: str, student_id: str) -> List[MessageOut]:
     """Récupère tous les messages d'une conversation."""
     msgs = get_conversation_messages(conversation_id, student_id)
     if not msgs:
-        # Peut signifier : conversation vide OU conversation qui n'appartient pas à l'élève
-        # On distingue par le count
         count = get_conversation_message_count(conversation_id)
         if count > 0:
-            # La conversation existe mais n'appartient pas à l'élève
             raise HTTPException(status_code=403, detail="Accès refusé à cette conversation.")
     return [
         MessageOut(
@@ -431,7 +477,7 @@ def remove_conversation(conversation_id: str, student_id: str) -> Dict[str, str]
 
 
 # ================================================
-# ENDPOINTS DE GESTION DE COURS (inchangés)
+# ENDPOINTS DE GESTION DE COURS
 # ================================================
 @app.post("/courses/upload", response_model=UploadResponse)
 async def upload_course(
@@ -460,6 +506,27 @@ async def upload_course(
                 filename=file.filename,
                 student_id=student_id,
             )
+            
+            # Extraire le texte complet depuis le vector_store
+            full_text_parts = []
+            try:
+                # Récupérer tous les chunks du vector store
+                chunks = session.vector_store.similarity_search("", k=100)
+                for doc in chunks:
+                    # Essayer d'extraire le texte original
+                    text = doc.metadata.get("raw_text", doc.page_content)
+                    full_text_parts.append(text)
+                full_text = "\n\n".join(full_text_parts)
+                print(f"[upload] Texte extrait: {len(full_text)} caractères")
+            except Exception as e:
+                print(f"[upload] Erreur extraction texte: {e}")
+                full_text = ""
+            
+            _active_courses[session.course_id] = {
+                "text": full_text,
+                "filename": session.filename,
+                "student_id": student_id,
+            }
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e)) from e
 
@@ -497,7 +564,7 @@ def explain_passage(req: ExplainRequest) -> ChatResponse:
     return ChatResponse(
         answer=result.answer,
         route=Route.COURSE.value,
-        conversation_id="",  # explain ne crée pas de conversation
+        conversation_id="",
         conversation_title="",
         citations=[
             CitationOut(filename=c.filename, page=c.page, excerpt=c.excerpt)
@@ -528,7 +595,63 @@ def delete_course(course_id: str, student_id: str) -> Dict[str, str]:
     if session is None:
         raise HTTPException(status_code=404, detail="Cours introuvable.")
     store.delete(course_id)
+    _active_courses.pop(course_id, None)
     return {"status": "deleted", "course_id": course_id}
+
+
+# ================================================
+# NOUVEAUX ENDPOINTS
+# ================================================
+@app.get("/student/agenda")
+async def get_agenda(student_id: str):
+    """Génère un planning de révision personnalisé pour la semaine."""
+    memory = await get_student_memory(student_id)
+    agenda = await generate_weekly_agenda(student_id, memory)
+    return agenda
+
+
+@app.post("/courses/fiche")
+async def generate_course_fiche(req: FicheRequest):
+    """Génère une fiche de révision complète (résumé, QCM, flashcards) depuis un cours uploadé."""
+    course = _active_courses.get(req.course_id)
+    if not course:
+        raise HTTPException(404, "Cours introuvable — uploadez-le d'abord")
+    
+    if course.get("student_id") != req.student_id:
+        raise HTTPException(403, "Ce cours n'appartient pas à cet élève")
+    
+    if not course.get("text"):
+        raise HTTPException(422, "Texte du cours non disponible pour la génération de fiche")
+    
+    fiche = await generate_fiche(course["text"], req.difficulty)
+    return fiche
+
+
+@app.post("/courses/fiche/pdf")
+async def generate_course_fiche_pdf(req: FicheRequest):
+    """Génère une fiche de révision au format PDF."""
+    course = _active_courses.get(req.course_id)
+    if not course:
+        raise HTTPException(404, "Cours introuvable — uploadez-le d'abord")
+    
+    if course.get("student_id") != req.student_id:
+        raise HTTPException(403, "Ce cours n'appartient pas à cet élève")
+    
+    if not course.get("text"):
+        raise HTTPException(422, "Texte du cours non disponible pour la génération de fiche")
+    
+    fiche = await generate_fiche(course["text"], req.difficulty)
+    pdf_bytes = generate_fiche_pdf(fiche, course["filename"])
+    
+    # Nettoyer le nom du fichier pour le téléchargement
+    base_name = course["filename"].replace('.pdf', '').replace('.docx', '').replace('.txt', '').replace('.md', '')
+    filename = f"fiche-{base_name}.pdf"
+    
+    return Response(
+        content=bytes(pdf_bytes),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+    )
 
 
 # ================================================
@@ -540,3 +663,16 @@ def reindex() -> Dict[str, str]:
     engine = get_faq_engine()
     engine.build_or_load(force_rebuild=True)
     return {"status": "ok", "message": "Index FAISS reconstruit."}
+
+
+# ================================================
+# POINT D'ENTRÉE
+# ================================================
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+    )

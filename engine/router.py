@@ -35,6 +35,101 @@ class Route(str, Enum):
 
 
 # ══════════════════════════════════════════════════════════════════════
+# 0. NORMALISATION DES ABRÉVIATIONS
+# ══════════════════════════════════════════════════════════════════════
+_ABREVIATIONS = {
+    # Français SMS
+    "pb": "problème",
+    "stp": "s'il te plaît",
+    "svp": "s'il vous plaît",
+    "msg": "message",
+    "rdv": "rendez-vous",
+    "tjrs": "toujours",
+    "bcp": "beaucoup",
+    "dc": "donc",
+    "pk": "pourquoi",
+    "pcq": "parce que",
+    "qd": "quand",
+    "ac": "avec",
+    "ss": "sans",
+    "tt": "tout",
+    "ts": "tous",
+    "nv": "nouveau",
+    "mtn": "maintenant",
+    "auj": "aujourd'hui",
+    "dem": "demain",
+    "exerc": "exercice",
+    "exo": "exercice",
+    "exos": "exercices",
+    "correcc": "correction",
+    "corec": "correction",
+    "explic": "explication",
+    "ds": "dans",
+    "pr": "pour",
+    "vs": "vous",
+    "ct": "c'était",
+    "jvx": "je veux",
+    "jsp": "je ne sais pas",
+    "chui": "je suis",
+    "g": "j'ai",
+    "ya": "il y a",
+    "kelke": "quelque",
+    # Abréviations scolaires
+    "maths": "mathématiques",
+    "svt": "sciences de la vie et de la terre",
+    "eps": "éducation physique",
+    "em": "emploi du temps",
+    "edt": "emploi du temps",
+    "interro": "interrogation",
+    "controle": "contrôle",
+    "ds": "devoir surveillé",
+    "dm": "devoir maison",
+    "tp": "travaux pratiques",
+    "td": "travaux dirigés",
+    "cours": "cours",
+    "notes": "notes",
+    "abs": "absences",
+    "absences": "absences",
+    "devoirs": "devoirs",
+    "menu": "menu",
+    "cantine": "cantine",
+    "heure": "heure",
+    "planning": "planning",
+    "schedule": "emploi du temps",
+    "grade": "note",
+    "grades": "notes",
+}
+
+
+def _normalize(text: str) -> str:
+    """Remplace les abréviations par leur forme complète pour le matching."""
+    # Séparer la ponctuation pour mieux traiter les mots
+    words = re.findall(r"[\w'\-]+|[^\w\s]", text, re.UNICODE)
+    result = []
+    for w in words:
+        # Si c'est un mot (pas de la ponctuation)
+        if re.match(r"[\w'\-]+$", w):
+            w_lower = w.lower()
+            # Remplacer si c'est une abréviation
+            if w_lower in _ABREVIATIONS:
+                result.append(_ABREVIATIONS[w_lower])
+            else:
+                result.append(w)
+        else:
+            # Ponctuation inchangée
+            result.append(w)
+    
+    # Reconstruire la phrase en gardant les espaces après les mots
+    normalized = ""
+    for i, w in enumerate(result):
+        if i > 0 and not re.match(r"^[.,!?;:)]$", w):
+            normalized += " "
+        normalized += w
+    
+    return normalized
+
+
+# ══════════════════════════════════════════════════════════════════════
 # 1. GREET — réponse prédéfinie, 0 LLM, 0 Supabase
 # ══════════════════════════════════════════════════════════════════════
 _GREET = re.compile(
@@ -104,6 +199,7 @@ def get_greet_response(query: str) -> str:
 #   - Paiements / frais en attente
 #   - Tout ce qui contient "aujourd'hui", "demain", "cette semaine", etc.
 #   - Pronoms personnels 1ère personne (mes, mon, ma, j'ai, je dois...)
+#   - MÉMOIRE LONG-TERME : souvenirs, rappels, conversations précédentes
 # ══════════════════════════════════════════════════════════════════════
 _DYNAMIC = re.compile(
     r"""
@@ -202,6 +298,15 @@ _DYNAMIC = re.compile(
       الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت|الأحد
     )\b |
 
+    # ── MÉMOIRE LONG-TERME / SOUVENIRS ──────────────────────────────────────
+    \b(
+      souvien|souviens|rappelle|rappelles|rappel|dernière\s+fois|on\s+a\s+parlé|
+      précédemment|avant|hier\s+(on|tu|j[' ]ai)|tu\s+te\s+souviens|est-ce\s+que\s+tu\s+te\s+souviens|
+      dernière\s+discussion|dernier\s+topic|notre\s+conversation|
+      remember|last\s+time|we\s+talked|last\s+discussion|do\s+you\s+remember|
+      تذكر|هل\s+تذكر|آخر\s+مرة|سبق\s+وتحدثنا|محادثتنا
+    )\b |
+
     # ── POSSESSIFS 1ÈRE PERSONNE ────────────────────────────────────────────
     \bmes\s+(notes?|devoirs?|absences?|cours|retards?|paiements?|
              réunions?|moyennes?|résultats?|professeurs?)\b |
@@ -231,7 +336,8 @@ _ADMIN = re.compile(
     r"devoir|devoirs|homework|assignment|"
     r"paiement|paiements|payment|frais|fee|"
     r"réunion|meeting|annonce|announcement|"
-    r"مطعم|وجبة|درجة|جدول|غياب|واجب|مدفوعات|إعلان"
+    r"souvien|souviens|rappelle|remember|last\s+time|"
+    r"مطعم|وجبة|درجة|جدول|غياب|واجب|مدفوعات|إعلان|تذكر"
     r")\b",
     re.IGNORECASE | re.UNICODE,
 )
@@ -250,16 +356,33 @@ class Router:
         self,
         query: str,
         course_id: Optional[str] = None,
+        memory_profile: str = "",
     ) -> Tuple[Route, Optional[Document], float]:
         """
         Retourne (route, faq_doc_ou_None, score).
         Aucun appel LLM — 100% règles.
+        
+        Args:
+            query: Question de l'élève
+            course_id: ID du cours uploadé (optionnel)
+            memory_profile: Profil mémoire de l'élève (optionnel, utilisé dans DYNAMIC)
         """
-        q = query.strip()
+        # ═══════════════════════════════════════════════════════════════
+        # NORMALISATION : remplacer les abréviations pour le matching
+        # ═══════════════════════════════════════════════════════════════
+        q_original = query.strip()
+        q_normalized = _normalize(q_original)
+        
+        # Utiliser la version normalisée pour le matching
+        q = q_normalized
+        
+        # Log de la normalisation (utile pour déboguer)
+        if q_normalized != q_original:
+            print(f"[Router] 🔧 Normalisation: {q_original[:50]}... → {q_normalized[:50]}...")
 
         # 1. GREET — salutation / message très court sans contenu
         if _GREET.match(q):
-            print(f"[Router] 👋 GREET: {q!r}")
+            print(f"[Router] 👋 GREET: {q_original!r}")
             return Route.GREET, None, 0.0
 
         # 2. COURSE — cours uploadé actif et question pédagogique
@@ -268,23 +391,23 @@ class Router:
             print(f"[Router] 📚 COURSE: course_id={course_id}")
             return Route.COURSE, None, 0.0
 
-        # 3. DYNAMIC — mot-clé données BD / personnel / temporel
+        # 3. DYNAMIC — mot-clé données BD / personnel / temporel / mémoire
         if _DYNAMIC.search(q):
-            print(f"[Router] ⚡ DYNAMIC (keyword): {q[:80]!r}")
+            print(f"[Router] ⚡ DYNAMIC (keyword): {q_original[:80]!r}")
             return Route.DYNAMIC, None, 0.0
 
         # 4. FAQ — recherche vectorielle avec seuil haut
-        match = self._faq.best_match(q)
+        match = self._faq.best_match(q_original)  # Utiliser l'original pour la FAQ
         if match:
             doc, score = match
             if score >= _FAQ_THRESHOLD:
-                print(f"[Router] 📖 FAQ (score={score:.3f}): {q[:80]!r}")
+                print(f"[Router] 📖 FAQ (score={score:.3f}): {q_original[:80]!r}")
                 return Route.FAQ, doc, score
 
         # 5. DYNAMIC par défaut — mieux que risquer une FAQ incorrecte
         print(
             f"[Router] ⚡ DYNAMIC (default, score={match[1] if match else 0:.3f}): "
-            f"{q[:80]!r}"
+            f"{q_original[:80]!r}"
         )
         return Route.DYNAMIC, None, match[1] if match else 0.0
 

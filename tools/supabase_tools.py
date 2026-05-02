@@ -7,13 +7,15 @@ Le `student_id` n'est JAMAIS passé en paramètre par le LLM. Il est injecté
 depuis le contexte de la requête (JWT / session). Le LLM ne peut donc pas
 demander les données d'un autre élève.
 
-Chaque fonction est annotée avec un docstring détaillé : c'est ce que le
-LLM lit pour décider quand l'appeler.
+RÈGLE ANTI-HALLUCINATION :
+---------------------------
+Chaque tool retourne exactement les données de Supabase.
+Le LLM NE DOIT PAS inventer ou compléter — il reformule uniquement ce qui est retourné.
 """
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
-from typing import Optional
+from typing import Optional, Tuple
 
 from langchain_core.tools import tool
 from supabase import Client, create_client
@@ -30,9 +32,7 @@ def get_supabase() -> Client:
     global _client
     if _client is None:
         settings.validate()
-        _client = create_client(
-            settings.SUPABASE_URL, settings.SUPABASE_SERVICE_KEY
-        )
+        _client = create_client(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_KEY)
     return _client
 
 
@@ -40,26 +40,13 @@ def get_supabase() -> Client:
 # Contexte d'appel (student_id injecté)
 # ============================================
 class StudentContext:
-    """
-    Contexte thread-local-style stockant l'identité de l'élève courant.
-    Utilisé par les tools pour filtrer les données sans que le LLM
-    ait besoin (ou le droit) de manipuler le student_id.
-    """
-
     _current_student_id: Optional[str] = None
-    _current_student_id: Optional[str] = None
-    _current_class_id: Optional[str] = None  # cache : rempli à la demande via Supabase
+    _current_class_id: Optional[str] = None
 
     @classmethod
     def set(cls, student_id: str, class_id: Optional[str] = None) -> None:
-        """
-        Initialise le contexte pour une requête.
-        - student_id est obligatoire
-        - class_id est optionnel : si non fourni, il sera récupéré automatiquement
-          depuis Supabase au moment où un tool en a besoin (lazy loading).
-        """
         cls._current_student_id = student_id
-        cls._current_class_id = class_id  # peut être None, sera rempli à la demande
+        cls._current_class_id = class_id
 
     @classmethod
     def get_student_id(cls) -> str:
@@ -69,17 +56,10 @@ class StudentContext:
 
     @classmethod
     def get_class_id(cls) -> Optional[str]:
-        """
-        Retourne le class_id. S'il n'a pas été fourni explicitement,
-        va le chercher dans Supabase (une seule fois, puis met en cache).
-        """
         if cls._current_class_id is not None:
             return cls._current_class_id
-
         if cls._current_student_id is None:
             return None
-
-        # Lazy fetch depuis Supabase
         try:
             sb = get_supabase()
             res = (
@@ -90,7 +70,7 @@ class StudentContext:
                 .execute()
             )
             class_id = (res.data or {}).get("class_id")
-            cls._current_class_id = class_id  # cache pour les appels suivants
+            cls._current_class_id = class_id
             return class_id
         except Exception as e:
             print(f"[StudentContext] Impossible de récupérer class_id : {e}")
@@ -103,127 +83,241 @@ class StudentContext:
 
 
 # ============================================
-# Helpers
+# Helpers — jours
 # ============================================
 DAYS_FR = {
     0: "lundi", 1: "mardi", 2: "mercredi", 3: "jeudi",
     4: "vendredi", 5: "samedi", 6: "dimanche",
 }
 
+# Enum exact attendu par la colonne day_of_week de Supabase
+# ⚠️  "sunday" n'existe PAS dans l'enum — les écoles n'ont pas cours le dimanche
 DAYS_ENUM = {
-    0: "monday", 1: "tuesday", 2: "wednesday", 3: "thursday",
-    4: "friday", 5: "saturday", 6: "sunday",
+    0: "monday",
+    1: "tuesday",
+    2: "wednesday",
+    3: "thursday",
+    4: "friday",
+    5: "saturday",
+    # 6 (dimanche) intentionnellement absent → intercepté en amont
 }
 
-# Mapping nom de jour → index (0 = lundi, 6 = dimanche)
-# On accepte français, anglais, arabe standard, dialecte tunisien
+# Jours sans cours (pas dans l'enum DB)
+NO_SCHOOL_DAYS: set[int] = {6}   # dimanche = 6 en weekday()
+
+# Message renvoyé quand on demande l'emploi du temps un jour férié/repos
+def _no_school_msg(target_date: "date", lang: str = "fr") -> str:  # type: ignore[name-defined]
+    day = DAYS_FR[target_date.weekday()]
+    msgs = {
+        "fr": f"Pas de cours le {day} {target_date.isoformat()} (jour de repos).",
+        "en": f"No classes on {day} {target_date.isoformat()} (day off).",
+        "ar": f"لا دروس يوم {day} {target_date.isoformat()} (يوم عطلة).",
+    }
+    return msgs.get(lang, msgs["fr"])
+
 DAY_NAME_TO_INDEX = {
     # Lundi
-    "lundi": 0, "monday": 0, "mon": 0,
+    "lundi": 0, "monday": 0, "mon": 0, "lun": 0,
     "الاثنين": 0, "الإثنين": 0, "الاتنين": 0,
-    "tnin": 0, "lethnine": 0, "lethnin": 0,
+    "tnin": 0, "lethnine": 0, "lethnin": 0, "ithnayn": 0,
     # Mardi
-    "mardi": 1, "tuesday": 1, "tue": 1, "tues": 1,
+    "mardi": 1, "tuesday": 1, "tue": 1, "tues": 1, "mar": 1,
     "الثلاثاء": 1, "الثلاثا": 1,
     "thlatha": 1, "tlata": 1,
     # Mercredi
-    "mercredi": 2, "wednesday": 2, "wed": 2,
+    "mercredi": 2, "wednesday": 2, "wed": 2, "mer": 2,
     "الأربعاء": 2, "الاربعاء": 2,
-    "lerba3": 2, "larbaa": 2,
+    "lerba3": 2, "larbaa": 2, "arba3a": 2,
     # Jeudi
-    "jeudi": 3, "thursday": 3, "thu": 3, "thur": 3, "thurs": 3,
+    "jeudi": 3, "thursday": 3, "thu": 3, "thur": 3, "jeu": 3,
     "الخميس": 3,
-    "lekhmis": 3, "khmiss": 3,
+    "lekhmis": 3, "khmiss": 3, "khamis": 3,
     # Vendredi
-    "vendredi": 4, "friday": 4, "fri": 4,
+    "vendredi": 4, "friday": 4, "fri": 4, "ven": 4,
     "الجمعة": 4, "الجمعه": 4,
-    "jem3a": 4, "jomaa": 4,
+    "jem3a": 4, "jomaa": 4, "jum3a": 4,
     # Samedi
-    "samedi": 5, "saturday": 5, "sat": 5,
+    "samedi": 5, "saturday": 5, "sat": 5, "sam": 5,
     "السبت": 5,
-    "sebt": 5,
+    "sebt": 5, "sbet": 5,
     # Dimanche
-    "dimanche": 6, "sunday": 6, "sun": 6,
+    "dimanche": 6, "sunday": 6, "sun": 6, "dim": 6,
     "الأحد": 6, "الاحد": 6,
-    "lahad": 6, "el a7ad": 6,
+    "lahad": 6, "el a7ad": 6, "ahad": 6,
 }
 
 
 def _parse_date(date_str: Optional[str]) -> date:
     """
-    Parse une date depuis plusieurs formats :
-    - Mots-clés : 'today', 'tomorrow', 'yesterday', équivalents fr/ar
-    - Format ISO : 'YYYY-MM-DD'
-    - Nom d'un jour : 'lundi', 'monday', 'الاثنين'... (= prochain jour correspondant)
-    - Nom d'un jour + modificateur : 'lundi prochain', 'ce lundi', 'next monday'
+    Parse une date depuis plusieurs formats.
+
+    BUG FIX : "même jour" = aujourd'hui, pas la semaine prochaine.
+    On ne saute à la semaine suivante QUE si le modificateur est 'prochain'/'next'.
     """
     if not date_str:
         return date.today()
 
     s = date_str.strip().lower()
 
-    # Aujourd'hui
-    if s in ("today", "aujourd'hui", "aujourdhui", "aujourd’hui", "اليوم", "lyoum", "el yom"):
+    # ── Mots-clés : aujourd'hui ──────────────────────────────────────────────
+    TODAY_KEYWORDS = {
+        "today", "aujourd'hui", "aujourdhui", "ajourd'hui",
+        "اليوم", "lyoum", "el yom", "yawm", "nhar",
+        # dialecte tunisien
+        "lyouma", "elyoum",
+    }
+    if s in TODAY_KEYWORDS:
         return date.today()
 
-    # Demain
-    if s in ("tomorrow", "demain", "غدا", "غداً", "غدًا", "ghodwa", "ghodowa"):
+    # ── Mots-clés : demain ───────────────────────────────────────────────────
+    TOMORROW_KEYWORDS = {
+        "tomorrow", "demain",
+        "غدا", "غداً", "غدًا", "ghodwa", "ghodowa", "ghodua",
+        "bokra", "boukra",
+    }
+    if s in TOMORROW_KEYWORDS:
         return date.today() + timedelta(days=1)
 
-    # Hier
-    if s in ("yesterday", "hier", "أمس", "امس", "elbareh", "lbereh"):
+    # ── Mots-clés : hier ─────────────────────────────────────────────────────
+    YESTERDAY_KEYWORDS = {
+        "yesterday", "hier",
+        "أمس", "امس", "elbareh", "lbereh", "bareh",
+    }
+    if s in YESTERDAY_KEYWORDS:
         return date.today() - timedelta(days=1)
 
-    # Format ISO
+    # ── Format ISO ───────────────────────────────────────────────────────────
     try:
-        return datetime.strptime(date_str, "%Y-%m-%d").date()
+        return datetime.strptime(date_str.strip(), "%Y-%m-%d").date()
     except ValueError:
         pass
 
-    # Nom de jour (avec modificateurs optionnels : "lundi prochain", "ce lundi"...)
-    # On retire les modificateurs pour ne garder que le nom du jour
-    MODIFIERS = {
-        "prochain", "prochaine", "next",
-        "ce", "cette", "this",
-        "dernier", "dernière", "last", "passé", "passée",
-        "القادم", "الماضي", "هذا",
-    }
-    words = s.replace("-", " ").split()
-    day_word = None
-    has_last_modifier = any(m in words for m in ("dernier", "dernière", "last", "passé", "passée", "الماضي"))
+    # ── Nom de jour (avec modificateurs optionnels) ──────────────────────────
+    NEXT_MODIFIERS = {"prochain", "prochaine", "next", "القادم"}
+    LAST_MODIFIERS = {"dernier", "dernière", "last", "passé", "passée", "الماضي"}
+    THIS_MODIFIERS = {"ce", "cette", "this", "هذا"}
 
-    for word in words:
-        if word in DAY_NAME_TO_INDEX:
-            day_word = word
-            break
+    words = s.replace("-", " ").split()
+    has_next = any(m in words for m in NEXT_MODIFIERS)
+    has_last = any(m in words for m in LAST_MODIFIERS)
+    # "ce lundi" = lundi de CETTE semaine (pas forcément le prochain)
+    has_this = any(m in words for m in THIS_MODIFIERS)
+
+    day_word = next((w for w in words if w in DAY_NAME_TO_INDEX), None)
 
     if day_word is not None:
         target_idx = DAY_NAME_TO_INDEX[day_word]
         today = date.today()
-        today_idx = today.weekday()
+        today_idx = today.weekday()  # 0=lundi
 
-        if has_last_modifier:
-            # Jour passé de la semaine en cours ou précédente
+        if has_last:
             days_ago = (today_idx - target_idx) % 7
             if days_ago == 0:
-                days_ago = 7  # même jour = celui de la semaine passée
+                days_ago = 7
             return today - timedelta(days=days_ago)
-        else:
-            # Par défaut : prochaine occurrence (y compris aujourd'hui si c'est le bon jour)
+
+        if has_this:
+            # "ce lundi" → lundi de la semaine courante (peut être passé)
+            days_diff = (target_idx - today_idx) % 7
+            if days_diff > 3:
+                days_diff -= 7  # si trop loin dans le futur, c'est la semaine passée
+            return today + timedelta(days=days_diff)
+
+        if has_next:
+            # "lundi prochain" → strictement la semaine suivante
             days_ahead = (target_idx - today_idx) % 7
             if days_ahead == 0:
-                days_ahead = 7  # même jour = celui de la semaine prochaine
+                days_ahead = 7
             return today + timedelta(days=days_ahead)
+
+        # ── FIX CRITIQUE : sans modificateur ────────────────────────────────
+        # "lundi" = le prochain lundi Y COMPRIS aujourd'hui si c'est lundi.
+        # L'ancienne version faisait days_ahead=7 si days_ahead==0,
+        # ce qui renvoyait la semaine suivante quand l'élève voulait aujourd'hui.
+        days_ahead = (target_idx - today_idx) % 7
+        return today + timedelta(days=days_ahead)  # 0 = aujourd'hui ✓
 
     raise ValueError(
         f"Format de date non reconnu : '{date_str}'. "
-        "Utilise 'today', 'tomorrow', 'YYYY-MM-DD', ou un nom de jour "
-        "('lundi', 'monday', 'lundi prochain'...)."
+        "Utilise 'today', 'tomorrow', 'YYYY-MM-DD', ou un nom de jour."
     )
 
 
+def _week_bounds(offset: int = 0) -> Tuple[date, date]:
+    """
+    Retourne (lundi, dimanche) d'une semaine.
+    offset=0 → semaine courante
+    offset=-1 → semaine précédente
+    offset=1 → semaine prochaine
+    """
+    today = date.today()
+    monday = today - timedelta(days=today.weekday()) + timedelta(weeks=offset)
+    sunday = monday + timedelta(days=6)
+    return monday, sunday
+
+
+def _parse_period_range(period_str: Optional[str]) -> Tuple[Optional[date], Optional[date]]:
+    """
+    Convertit un mot-clé de période en (date_debut, date_fin).
+    Retourne (None, None) si non reconnu (= pas de filtre).
+
+    Accepte (FR / EN / dialecte tunisien) :
+    - "cette semaine", "this week", "hal jem3a"
+    - "la semaine dernière", "last week", "ljom3a lli fattet"
+    - "ce mois", "this month", "hal chhar"
+    - "le mois dernier", "last month"
+    - "aujourd'hui", "today"
+    - "trimestre 1/2/3", "trimester_1/2/3"
+    """
+    if not period_str:
+        return None, None
+
+    s = period_str.strip().lower()
+
+    # Aujourd'hui
+    if any(k in s for k in ("today", "aujourd", "lyoum", "elyoum", "yawm", "nhar")):
+        d = date.today()
+        return d, d
+
+    # Cette semaine
+    if any(k in s for k in (
+        "cette semaine", "this week", "semaine en cours", "semaine actuelle",
+        "hal jem3a", "hal jom3a", "hath ljom3a", "الأسبوع الحالي", "هذا الأسبوع",
+        "current week", "la semaine",
+    )):
+        return _week_bounds(0)
+
+    # Semaine dernière
+    if any(k in s for k in (
+        "semaine dernière", "semaine passée", "last week", "previous week",
+        "ljom3a lli fattet", "الأسبوع الماضي",
+    )):
+        return _week_bounds(-1)
+
+    # Ce mois
+    if any(k in s for k in (
+        "ce mois", "ce mois-ci", "this month", "hal chhar", "هذا الشهر",
+        "le mois", "month",
+    )):
+        today = date.today()
+        first = today.replace(day=1)
+        return first, today
+
+    # Mois dernier
+    if any(k in s for k in (
+        "mois dernier", "mois passé", "last month", "الشهر الماضي",
+    )):
+        today = date.today()
+        first_this = today.replace(day=1)
+        last_month_end = first_this - timedelta(days=1)
+        last_month_start = last_month_end.replace(day=1)
+        return last_month_start, last_month_end
+
+    return None, None
+
+
 # ============================================
-# TOOLS — chaque fonction est exposée au LLM
+# TOOLS
 # ============================================
 
 @tool
@@ -231,35 +325,62 @@ def get_student_schedule(date_str: Optional[str] = None) -> str:
     """
     Retourne l'emploi du temps de l'élève pour un jour donné.
 
+    IMPORTANT : Appelle ce tool DÈS QUE la question porte sur l'emploi du temps,
+    les cours, les séances ou les horaires — peu importe comment c'est formulé.
+
     Args:
-        date_str: La date, acceptant de NOMBREUX formats :
-          - Format ISO : '2026-04-27'
-          - Relatif : 'today', 'aujourd''hui', 'tomorrow', 'demain', 'yesterday', 'hier'
-          - Nom de jour : 'lundi', 'monday', 'الاثنين' → prochain jour correspondant
-          - Nom + modificateur : 'lundi prochain', 'ce lundi', 'next monday',
-            'lundi dernier', 'last monday'
-          - Dialecte tunisien : 'ghodwa' (demain), 'lyoum' (aujourd'hui)
-          Par défaut = aujourd'hui.
+        date_str: La date cible. Valeurs acceptées :
+          ┌─ Relatif ──────────────────────────────────────────────────────┐
+          │  "today" / "aujourd'hui" / "lyoum"   → aujourd'hui             │
+          │  "tomorrow" / "demain" / "ghodwa"    → demain                  │
+          │  "yesterday" / "hier" / "lbereh"     → hier                    │
+          ├─ Nom de jour ───────────────────────────────────────────────────┤
+          │  "lundi" / "monday" / "الاثنين"      → ce lundi (si futur),    │
+          │                                         ou aujourd'hui si c'est│
+          │                                         lundi                   │
+          │  "lundi prochain" / "next monday"    → strictement semaine+1   │
+          │  "lundi dernier" / "last monday"     → lundi de la sem passée  │
+          ├─ ISO ───────────────────────────────────────────────────────────┤
+          │  "2026-05-12"                         → date exacte            │
+          └─────────────────────────────────────────────────────────────────┘
+          Par défaut (date_str=None ou vide) = AUJOURD'HUI.
 
-    À utiliser pour répondre aux questions :
-    - "Est-ce que j'ai cours demain ?"
-    - "Quel est mon emploi du temps aujourd'hui ?"
-    - "À quelle heure commence mon premier cours ?"
+    Exemples de questions → date_str à passer :
+      "j'ai cours aujourd'hui ?"      → date_str="today"  (ou None)
+      "j'ai cours demain ?"           → date_str="tomorrow"
+      "mon emploi du temps de lundi"  → date_str="lundi"
+      "cours de mercredi prochain"    → date_str="mercredi prochain"
+      "est-ce que j'ai cours ?"       → date_str=None  (= aujourd'hui)
+      "عندي دروس اليوم؟"              → date_str="today"
+      "شنوا عندي غدوة؟"              → date_str="tomorrow"
     """
-    target_date = _parse_date(date_str)
-    day_of_week = DAYS_ENUM[target_date.weekday()]
+    try:
+        target_date = _parse_date(date_str)
+    except ValueError as e:
+        return f"Je n'ai pas pu interpréter la date '{date_str}'. {e}"
 
-    # Récupère le class_id (cache ou lazy fetch depuis Supabase)
+    # ── Jour sans cours (dimanche ou autre jour hors enum) ───────────────────
+    if target_date.weekday() in NO_SCHOOL_DAYS:
+        return _no_school_msg(target_date)
+
+    day_of_week = DAYS_ENUM.get(target_date.weekday())
+    if day_of_week is None:
+        return f"Jour non géré dans l'emploi du temps : {DAYS_FR.get(target_date.weekday(), '?')}."
+
+    day_label = DAYS_FR[target_date.weekday()]
+
     class_id = StudentContext.get_class_id()
     if not class_id:
         return "Aucune classe n'est associée à cet élève."
 
     sb = get_supabase()
-
-    # Emploi du temps
     slots = (
         sb.table("schedule_slots")
-        .select("start_time, end_time, room, subjects(name), teachers(profile_id, profiles(first_name, last_name))")
+        .select(
+            "start_time, end_time, room, "
+            "subjects(name), "
+            "teachers(profile_id, profiles(first_name, last_name))"
+        )
         .eq("class_id", class_id)
         .eq("day_of_week", day_of_week)
         .eq("is_active", True)
@@ -268,15 +389,22 @@ def get_student_schedule(date_str: Optional[str] = None) -> str:
     )
 
     if not slots.data:
-        return f"Aucun cours prévu pour {DAYS_FR[target_date.weekday()]} {target_date.isoformat()}."
+        # Message précis : on indique le VRAI jour demandé, pas "demain"
+        return (
+            f"Aucun cours prévu pour le {day_label} {target_date.isoformat()}. "
+            f"(Vérifie que l'emploi du temps est bien saisi pour ce jour.)"
+        )
 
-    lines = [f"Emploi du temps du {DAYS_FR[target_date.weekday()]} {target_date.isoformat()} :"]
+    lines = [f"Emploi du temps du {day_label} {target_date.isoformat()} :"]
     for s in slots.data:
-        subject = (s.get("subjects") or {}).get("name", "?")
+        subject = (s.get("subjects") or {}).get("name", "Matière inconnue")
         teacher = s.get("teachers") or {}
-        prof = (teacher.get("profiles") or {})
-        teacher_name = f"{prof.get('first_name', '')} {prof.get('last_name', '')}".strip() or "prof inconnu"
-        room = s.get("room") or "?"
+        prof = teacher.get("profiles") or {}
+        teacher_name = (
+            f"{prof.get('first_name', '')} {prof.get('last_name', '')}".strip()
+            or "prof non renseigné"
+        )
+        room = s.get("room") or "salle non précisée"
         lines.append(
             f"- {s['start_time'][:5]}–{s['end_time'][:5]} : {subject} "
             f"(salle {room}, {teacher_name})"
@@ -289,24 +417,26 @@ def get_canteen_menu(date_str: Optional[str] = None) -> str:
     """
     Retourne le menu de la cantine pour un jour donné.
 
+    IMPORTANT : Utilise ce tool pour TOUTE question sur la cantine, le repas,
+    ce qu'on mange, le déjeuner — même si c'est formulé de façon familière.
+
     Args:
-        date_str: La date, acceptant de NOMBREUX formats :
-          - Format ISO : '2026-04-27'
-          - Relatif : 'today', 'aujourd''hui', 'tomorrow', 'demain', 'yesterday', 'hier'
-          - Nom de jour : 'lundi', 'monday', 'الاثنين' → prochain jour correspondant
-          - Nom + modificateur : 'lundi prochain', 'ce lundi', 'lundi dernier'
-          - Dialecte tunisien : 'ghodwa', 'lyoum'
+        date_str: La date cible (mêmes formats que get_student_schedule).
           Par défaut = aujourd'hui.
 
-    À utiliser pour répondre aux questions :
-    - "Quel est le menu d'aujourd'hui ?"
-    - "Qu'est-ce qu'on mange demain à la cantine ?"
-    - "Quel est le menu du lundi ?" → date_str='lundi'
-    - "Menu de lundi prochain ?" → date_str='lundi prochain'
+    Exemples de questions → date_str à passer :
+      "quel est le menu aujourd'hui ?"   → date_str="today"
+      "qu'est-ce qu'on mange demain ?"   → date_str="tomorrow"
+      "menu du lundi prochain"           → date_str="lundi prochain"
+      "menu de lundi ?"                  → date_str="lundi"
+      "شنوا في الكانتين اليوم؟"          → date_str="today"
     """
-    target_date = _parse_date(date_str)
-    sb = get_supabase()
+    try:
+        target_date = _parse_date(date_str)
+    except ValueError as e:
+        return f"Je n'ai pas pu interpréter la date '{date_str}'. {e}"
 
+    sb = get_supabase()
     res = (
         sb.table("canteen_menus")
         .select("*")
@@ -316,89 +446,148 @@ def get_canteen_menu(date_str: Optional[str] = None) -> str:
     )
 
     if not res.data:
-        return f"Aucun menu n'est disponible pour le {target_date.isoformat()}."
+        return (
+            f"Aucun menu n'est disponible pour le {target_date.isoformat()}. "
+            f"Le menu n'a peut-être pas encore été publié."
+        )
 
     m = res.data[0]
-    parts = [f"Menu du {target_date.isoformat()} :"]
+    day_label = DAYS_FR[target_date.weekday()]
+    parts = [f"Menu du {day_label} {target_date.isoformat()} :"]
 
     starters = m.get("starters") or ([m["starter"]] if m.get("starter") else [])
     if starters:
-        parts.append(f"- Entrée : {', '.join(starters)}")
+        parts.append(f"- Entrée : {', '.join(str(x) for x in starters)}")
 
     mains = m.get("main_courses") or ([m["main_course"]] if m.get("main_course") else [])
     if mains:
-        parts.append(f"- Plat : {', '.join(mains)}")
+        parts.append(f"- Plat principal : {', '.join(str(x) for x in mains)}")
 
     if m.get("side_dish"):
         parts.append(f"- Accompagnement : {m['side_dish']}")
 
     desserts = m.get("desserts_list") or ([m["dessert"]] if m.get("dessert") else [])
     if desserts:
-        parts.append(f"- Dessert : {', '.join(desserts)}")
+        parts.append(f"- Dessert : {', '.join(str(x) for x in desserts)}")
 
     if m.get("allergens"):
-        parts.append(f"- Allergènes : {', '.join(m['allergens'])}")
+        parts.append(f"- ⚠️ Allergènes : {', '.join(m['allergens'])}")
 
     return "\n".join(parts)
 
 
 @tool
-def get_student_grades(subject_name: Optional[str] = None, period: Optional[str] = None) -> str:
+def get_student_grades(
+    subject_name: Optional[str] = None,
+    period: Optional[str] = None,
+) -> str:
     """
-    Retourne les notes de l'élève.
+    Retourne les notes et la moyenne de l'élève.
+
+    IMPORTANT : Utilise ce tool pour TOUTE question sur les notes, les moyennes,
+    les résultats, les évaluations — même formulée simplement.
 
     Args:
-        subject_name: (optionnel) filtrer par matière, ex: 'Mathématiques', 'Français'.
-        period: (optionnel) filtrer par période, ex: 'trimester_1', 'trimester_2'.
+        subject_name: (optionnel) nom de la matière à filtrer.
+          Accepte des noms partiels et différentes langues :
+          'maths', 'math', 'mathématiques', 'رياضيات',
+          'arabe', 'arabic', 'عربية', 'français', 'french',
+          'physique', 'phys', 'svt', 'histoire', 'anglais', ...
+        period: (optionnel) 'trimester_1', 'trimester_2', 'trimester_3'.
+          Accepte aussi : '1er trimestre', 'trimestre 1', 'T1',
+          'premier trimestre', 'first trimester'.
 
-    À utiliser pour répondre aux questions :
-    - "Quelles sont mes notes ?"
-    - "Quelle est ma moyenne en maths ?"
-    - "Mes notes du trimestre 2 ?"
+    Exemples de questions → arguments à passer :
+      "mes notes ?"                       → subject_name=None, period=None
+      "ma moyenne en maths ?"             → subject_name="maths"
+      "mes notes d'arabe ?"               → subject_name="arabe"
+      "mes résultats du trimestre 2 ?"    → period="trimester_2"
+      "quelle est ma note en physique ?"  → subject_name="physique"
+      "معدلي في العربية؟"                 → subject_name="arabe"
+      "شنوا درجاتي؟"                      → subject_name=None
     """
     sb = get_supabase()
     student_id = StudentContext.get_student_id()
+
+    # ── Normaliser period ────────────────────────────────────────────────────
+    period_normalized = period
+    if period:
+        p = period.strip().lower()
+        if any(k in p for k in ("1", "premier", "first", "t1", "uno")):
+            period_normalized = "trimester_1"
+        elif any(k in p for k in ("2", "deuxième", "second", "t2", "dos")):
+            period_normalized = "trimester_2"
+        elif any(k in p for k in ("3", "troisième", "third", "t3", "tres")):
+            period_normalized = "trimester_3"
 
     query = (
         sb.table("grades")
         .select("score, max_score, coefficient, title, period, grade_date, subjects(name)")
         .eq("student_id", student_id)
         .order("grade_date", desc=True)
-        .limit(30)
+        .limit(50)
     )
-
-    if period:
-        query = query.eq("period", period)
+    if period_normalized:
+        query = query.eq("period", period_normalized)
 
     res = query.execute()
     rows = res.data or []
 
-    # Filtrage matière côté Python (plus tolérant qu'un LIKE SQL)
+    # ── Filtrage matière côté Python (tolérant aux fautes / abréviations) ────
     if subject_name:
-        needle = subject_name.lower()
+        needle = subject_name.strip().lower()
+        # Mapping abréviations → mots-clés
+        SUBJECT_ALIASES = {
+            "maths": "math", "mathématiques": "math", "رياضيات": "math",
+            "arabe": "arab", "arabic": "arab", "عربية": "arab", "عربي": "arab",
+            "français": "fran", "french": "fran", "فرنسية": "fran",
+            "anglais": "angl", "english": "angl", "إنجليزية": "angl",
+            "physique": "phys", "physics": "phys", "فيزياء": "phys",
+            "svt": "svt", "bio": "bio", "biologie": "bio",
+            "histoire": "hist", "history": "hist", "تاريخ": "hist",
+            "géo": "geo", "géographie": "geo", "geography": "geo",
+            "info": "info", "informatique": "info",
+            "eco": "eco", "économie": "eco",
+            "philo": "philo", "philosophie": "philo",
+            "sport": "sport", "eps": "sport",
+        }
+        search_key = next(
+            (v for k, v in SUBJECT_ALIASES.items() if k in needle or needle in k),
+            needle
+        )
         rows = [
             r for r in rows
-            if needle in ((r.get("subjects") or {}).get("name", "").lower())
+            if search_key in ((r.get("subjects") or {}).get("name", "").lower())
+            or needle in ((r.get("subjects") or {}).get("name", "").lower())
         ]
 
     if not rows:
-        return "Aucune note trouvée pour ces critères."
+        subject_info = f" pour '{subject_name}'" if subject_name else ""
+        period_info = f" (période : {period_normalized})" if period_normalized else ""
+        return f"Aucune note trouvée{subject_info}{period_info}."
 
-    # Calcul de la moyenne pondérée
-    total_weighted = sum(float(r["score"]) * float(r.get("coefficient") or 1) for r in rows)
-    total_coef = sum(float(r.get("coefficient") or 1) for r in rows)
-    avg = total_weighted / total_coef if total_coef else 0
+    # ── Calcul moyenne pondérée ───────────────────────────────────────────────
+    valid = [r for r in rows if r.get("score") is not None]
+    if valid:
+        total_w = sum(float(r["score"]) * float(r.get("coefficient") or 1) for r in valid)
+        total_c = sum(float(r.get("coefficient") or 1) for r in valid)
+        avg = total_w / total_c if total_c else 0
+        avg_str = f"{avg:.2f}/20"
+    else:
+        avg_str = "N/A"
 
-    lines = [f"{len(rows)} note(s) trouvée(s). Moyenne pondérée : {avg:.2f}/20"]
-    for r in rows[:10]:
+    subject_label = f" ({subject_name})" if subject_name else ""
+    lines = [f"{len(rows)} note(s){subject_label} — Moyenne : {avg_str}"]
+    for r in rows[:15]:
         subject = (r.get("subjects") or {}).get("name", "?")
         title = r.get("title") or "évaluation"
-        lines.append(
-            f"- {r['grade_date']} · {subject} · {title} : "
-            f"{r['score']}/{r.get('max_score', 20)} (coef {r.get('coefficient', 1)})"
-        )
-    if len(rows) > 10:
-        lines.append(f"... et {len(rows) - 10} autres.")
+        score = r.get("score", "?")
+        max_s = r.get("max_score", 20)
+        coef = r.get("coefficient", 1)
+        gdate = (r.get("grade_date") or "?")[:10]
+        lines.append(f"- {gdate} · {subject} · {title} : {score}/{max_s} (coef {coef})")
+    if len(rows) > 15:
+        lines.append(f"... et {len(rows) - 15} autres notes.")
     return "\n".join(lines)
 
 
@@ -407,16 +596,20 @@ def get_student_assignments(upcoming_only: bool = True) -> str:
     """
     Retourne la liste des devoirs/travaux de l'élève.
 
-    Args:
-        upcoming_only: si True, ne retourne que les devoirs non encore rendus.
+    IMPORTANT : Utilise ce tool pour TOUTE question sur les devoirs,
+    le travail à faire, les DM, les rendus.
 
-    À utiliser pour répondre aux questions :
-    - "Quels devoirs dois-je rendre ?"
-    - "Y a-t-il des devoirs pour cette semaine ?"
+    Args:
+        upcoming_only: si True (défaut), ne retourne que les devoirs à venir.
+          Passe False pour avoir tous les devoirs (y compris passés).
+
+    Exemples de questions :
+      "j'ai des devoirs ?"                → upcoming_only=True
+      "qu'est-ce que je dois rendre ?"    → upcoming_only=True
+      "mes devoirs de la semaine"         → upcoming_only=True
+      "شنوا عندي نحضّر؟"                  → upcoming_only=True
     """
     sb = get_supabase()
-
-    # Récupère le class_id (cache ou lazy fetch)
     class_id = StudentContext.get_class_id()
     if not class_id:
         return "Aucune classe n'est associée à cet élève."
@@ -435,56 +628,121 @@ def get_student_assignments(upcoming_only: bool = True) -> str:
     if not res.data:
         return "Aucun devoir à rendre." if upcoming_only else "Aucun devoir trouvé."
 
-    lines = [f"{len(res.data)} devoir(s) :"]
+    lines = [f"{len(res.data)} devoir(s) à rendre :"]
     for a in res.data:
         subj = (a.get("subjects") or {}).get("name", "?")
-        due = a.get("due_date", "").split("T")[0]
-        lines.append(f"- {due} · {subj} · {a.get('type', 'homework')} : {a['title']}")
+        due = (a.get("due_date") or "?")[:10]
+        desc = a.get("description", "")
+        desc_short = f" — {desc[:80]}" if desc else ""
+        lines.append(
+            f"- {due} · {subj} · {a.get('type', 'devoir')} : {a['title']}{desc_short}"
+        )
     return "\n".join(lines)
 
 
 @tool
-def get_student_attendance(from_date: Optional[str] = None) -> str:
+def get_student_attendance(
+    period: Optional[str] = None,
+    from_date: Optional[str] = None,
+) -> str:
     """
-    Retourne les absences/retards récents de l'élève.
+    Retourne les absences et retards de l'élève pour une période.
+
+    IMPORTANT : Utilise ce tool pour TOUTE question sur les absences,
+    les retards, la présence — quelle que soit la formulation.
 
     Args:
-        from_date: date de départ au format 'YYYY-MM-DD'. Par défaut = 30 derniers jours.
+        period: Période en langage naturel. Exemples acceptés :
+          ┌────────────────────────────────────────────────────────────────┐
+          │  "cette semaine" / "this week" / "hal jem3a"                   │
+          │  "semaine dernière" / "last week"                              │
+          │  "ce mois" / "ce mois-ci" / "this month" / "hal chhar"        │
+          │  "mois dernier" / "last month"                                 │
+          │  "aujourd'hui" / "today"                                       │
+          └────────────────────────────────────────────────────────────────┘
+          Si period est fourni, from_date est ignoré.
+          Par défaut (period=None, from_date=None) = 30 derniers jours.
 
-    À utiliser pour :
-    - "Ai-je des absences ?"
-    - "Combien de retards ce mois-ci ?"
+        from_date: date de début au format 'YYYY-MM-DD' (si period non fourni).
+
+    Exemples de questions → arguments à passer :
+      "j'ai des absences cette semaine ?"       → period="cette semaine"
+      "combien de retards ce mois-ci ?"         → period="ce mois"
+      "absences la semaine dernière ?"          → period="semaine dernière"
+      "j'ai été absent aujourd'hui ?"           → period="aujourd'hui"
+      "mes absences depuis le 1er avril ?"      → from_date="2026-04-01"
+      "عندي غيابات هذا الأسبوع؟"               → period="cette semaine"
+      "كم مرة تأخرت هذا الشهر؟"                → period="ce mois"
     """
     sb = get_supabase()
     student_id = StudentContext.get_student_id()
 
-    start = (
-        _parse_date(from_date) if from_date else (date.today() - timedelta(days=30))
-    )
+    # ── Déterminer la plage de dates ─────────────────────────────────────────
+    start: Optional[date] = None
+    end: Optional[date] = None
+    period_label = "les 30 derniers jours"
 
-    res = (
+    if period:
+        start, end = _parse_period_range(period)
+        if start:
+            period_label = period
+
+    if start is None:
+        if from_date:
+            try:
+                start = _parse_date(from_date)
+                period_label = f"depuis le {start.isoformat()}"
+            except ValueError:
+                pass
+
+    if start is None:
+        start = date.today() - timedelta(days=30)
+
+    # ── Requête Supabase ─────────────────────────────────────────────────────
+    query = (
         sb.table("attendance")
-        .select("date, status, reason")
+        .select("date, status, reason, schedule_slots(start_time, end_time, subjects(name))")
         .eq("student_id", student_id)
         .gte("date", start.isoformat())
         .order("date", desc=True)
-        .execute()
     )
+    if end:
+        query = query.lte("date", end.isoformat())
 
+    res = query.execute()
     rows = res.data or []
-    if not rows:
-        return f"Aucune absence/retard depuis le {start.isoformat()}."
 
-    # Compteurs
+    # ── Filtrer : ne montrer que les absences et retards (pas les présences) ─
+    absences = [r for r in rows if r["status"] in ("absent", "late")]
+
+    if not absences:
+        return f"Aucune absence ni retard pour {period_label}. ✅"
+
     counts: dict[str, int] = {}
-    for r in rows:
+    for r in absences:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
 
-    summary = ", ".join(f"{v} {k}" for k, v in counts.items())
-    lines = [f"Depuis le {start.isoformat()} : {summary}."]
-    for r in rows[:10]:
+    summary_parts = []
+    if counts.get("absent"):
+        summary_parts.append(f"{counts['absent']} absence(s)")
+    if counts.get("late"):
+        summary_parts.append(f"{counts['late']} retard(s)")
+
+    lines = [f"Pour {period_label} : {', '.join(summary_parts)}."]
+    for r in absences[:15]:
+        slot = r.get("schedule_slots") or {}
+        subj = (slot.get("subjects") or {}).get("name", "")
+        time_range = ""
+        if slot.get("start_time") and slot.get("end_time"):
+            time_range = f" · {slot['start_time'][:5]}–{slot['end_time'][:5]}"
+        subject_str = f" · {subj}" if subj else ""
         reason = f" (raison : {r['reason']})" if r.get("reason") else ""
-        lines.append(f"- {r['date']} · {r['status']}{reason}")
+        status_label = "Absent" if r["status"] == "absent" else "Retard"
+        lines.append(
+            f"- {r['date']}{subject_str}{time_range} → {status_label}{reason}"
+        )
+    if len(absences) > 15:
+        lines.append(f"... et {len(absences) - 15} autres.")
     return "\n".join(lines)
 
 
@@ -493,12 +751,17 @@ def get_announcements(limit: int = 5) -> str:
     """
     Retourne les dernières annonces pour la classe de l'élève.
 
-    Args:
-        limit: nombre maximum d'annonces à retourner (défaut 5).
+    IMPORTANT : Utilise ce tool pour TOUTE question sur les actualités,
+    les nouvelles, les annonces, les communications de l'école.
 
-    À utiliser pour :
-    - "Y a-t-il des annonces ?"
-    - "Quelles sont les actualités ?"
+    Args:
+        limit: nombre maximum d'annonces (défaut 5, max 10).
+
+    Exemples de questions :
+      "y a-t-il des annonces ?"
+      "quoi de neuf à l'école ?"
+      "annonces importantes ?"
+      "شنوا في الأخبار؟"
     """
     sb = get_supabase()
     class_id = StudentContext.get_class_id()
@@ -508,10 +771,8 @@ def get_announcements(limit: int = 5) -> str:
         .select("title, content, is_pinned, published_at")
         .order("is_pinned", desc=True)
         .order("published_at", desc=True)
-        .limit(limit)
+        .limit(min(limit, 10))
     )
-
-    # On filtre sur les annonces de la classe OU les annonces générales (class_id null)
     if class_id:
         query = query.or_(f"class_id.eq.{class_id},class_id.is.null")
     else:
@@ -524,107 +785,92 @@ def get_announcements(limit: int = 5) -> str:
     lines = ["Dernières annonces :"]
     for a in res.data:
         pin = "📌 " if a.get("is_pinned") else ""
-        date_str = (a.get("published_at") or "").split("T")[0]
-        lines.append(f"{pin}[{date_str}] {a['title']} — {a['content'][:200]}")
+        date_str = (a.get("published_at") or "")[:10]
+        content_short = (a.get("content") or "")[:200]
+        lines.append(f"{pin}[{date_str}] {a['title']} — {content_short}")
     return "\n".join(lines)
 
 
 @tool
-def get_student_meetings(status: Optional[str] = None, upcoming_only: bool = True) -> str:
+def get_student_meetings(
+    status: Optional[str] = None,
+    upcoming_only: bool = True,
+) -> str:
     """
     Retourne les réunions parents-professeurs concernant l'élève.
 
     Args:
-        status: (optionnel) filtrer par statut : 'requested', 'confirmed',
-                'cancelled', 'completed'.
-        upcoming_only: si True (défaut), ne retourne que les réunions à venir.
+        status: (optionnel) 'requested', 'confirmed', 'cancelled', 'completed'.
+        upcoming_only: si True (défaut), réunions à venir uniquement.
 
-    À utiliser pour répondre aux questions :
-    - "Mes parents ont-ils des réunions prévues avec mes profs ?"
-    - "Quand est la prochaine rencontre parents-profs ?"
-    - "Y a-t-il une réunion de classe bientôt ?"
-    - "شكون من الأستاذة طلب إجتماع مع والديا؟"
+    Exemples de questions :
+      "mes parents ont une réunion avec un prof ?"
+      "prochaine réunion parents-profs ?"
+      "شكون طلب إجتماع مع والديّ؟"
     """
     sb = get_supabase()
     student_id = StudentContext.get_student_id()
     class_id = StudentContext.get_class_id()
 
-    # Deux cas : réunions individuelles (student_id) OU réunions de classe (class_id)
-    query_individual = (
-        sb.table("meetings")
-        .select(
-            "id, status, scheduled_at, duration_minutes, location, notes, "
-            "is_class_meeting, teachers(profile_id, profiles(first_name, last_name))"
-        )
-        .eq("student_id", student_id)
-        .order("scheduled_at", desc=False)
-        .limit(20)
+    def _build_meeting_query(table_query):
+        if status:
+            table_query = table_query.eq("status", status)
+        if upcoming_only:
+            table_query = table_query.gte("scheduled_at", datetime.now().isoformat())
+        return table_query
+
+    base_select = (
+        "id, status, scheduled_at, duration_minutes, location, notes, "
+        "is_class_meeting, teachers(profile_id, profiles(first_name, last_name))"
     )
-    if status:
-        query_individual = query_individual.eq("status", status)
-    if upcoming_only:
-        query_individual = query_individual.gte("scheduled_at", datetime.now().isoformat())
 
-    rows = (query_individual.execute().data) or []
+    q_ind = _build_meeting_query(
+        sb.table("meetings").select(base_select)
+        .eq("student_id", student_id)
+        .order("scheduled_at").limit(20)
+    )
+    rows = q_ind.execute().data or []
 
-    # Réunions de classe (is_class_meeting=True sur la classe de l'élève)
     if class_id:
-        query_class = (
-            sb.table("meetings")
-            .select(
-                "id, status, scheduled_at, duration_minutes, location, notes, "
-                "is_class_meeting, teachers(profile_id, profiles(first_name, last_name))"
-            )
+        q_cls = _build_meeting_query(
+            sb.table("meetings").select(base_select)
             .eq("class_id", class_id)
             .eq("is_class_meeting", True)
-            .order("scheduled_at", desc=False)
-            .limit(20)
+            .order("scheduled_at").limit(20)
         )
-        if status:
-            query_class = query_class.eq("status", status)
-        if upcoming_only:
-            query_class = query_class.gte("scheduled_at", datetime.now().isoformat())
-
-        class_rows = (query_class.execute().data) or []
         existing_ids = {r["id"] for r in rows}
-        rows.extend(r for r in class_rows if r["id"] not in existing_ids)
+        rows.extend(r for r in (q_cls.execute().data or []) if r["id"] not in existing_ids)
 
     if not rows:
-        return "Aucune réunion parents-professeurs prévue." if upcoming_only else "Aucune réunion trouvée."
+        return "Aucune réunion parents-professeurs prévue."
 
     rows.sort(key=lambda r: r.get("scheduled_at") or "")
-
     lines = [f"{len(rows)} réunion(s) :"]
     for m in rows:
         when = (m.get("scheduled_at") or "?").replace("T", " ")[:16]
-        status_str = m.get("status", "?")
-        duration = m.get("duration_minutes", 30)
-        location = m.get("location") or "lieu non précisé"
-        teacher = m.get("teachers") or {}
-        prof = teacher.get("profiles") or {}
-        teacher_name = f"{prof.get('first_name', '')} {prof.get('last_name', '')}".strip() or "prof inconnu"
-        meeting_type = "réunion de classe" if m.get("is_class_meeting") else f"avec {teacher_name}"
-
-        lines.append(
-            f"- {when} · {meeting_type} · {duration} min · {location} · [{status_str}]"
-        )
+        dur = m.get("duration_minutes", 30)
+        loc = m.get("location") or "lieu non précisé"
+        teacher = (m.get("teachers") or {}).get("profiles") or {}
+        tname = f"{teacher.get('first_name', '')} {teacher.get('last_name', '')}".strip() or "prof inconnu"
+        mtype = "réunion de classe" if m.get("is_class_meeting") else f"avec {tname}"
+        lines.append(f"- {when} · {mtype} · {dur} min · {loc} · [{m.get('status', '?')}]")
         if m.get("notes"):
             lines.append(f"  note : {m['notes'][:100]}")
-
     return "\n".join(lines)
 
 
 @tool
 def get_student_payments(status: Optional[str] = None) -> str:
     """
-    Retourne les paiements de l'élève.
+    Retourne les paiements et frais de scolarité de l'élève.
 
     Args:
-        status: (optionnel) filtrer par statut : 'pending', 'paid', 'overdue'.
+        status: (optionnel) 'pending', 'paid', 'overdue'.
 
-    À utiliser pour :
-    - "Ai-je des paiements en attente ?"
-    - "Quels sont mes frais de scolarité ?"
+    Exemples de questions :
+      "j'ai des paiements en attente ?"
+      "mes frais de scolarité ?"
+      "est-ce que j'ai des dettes ?"
     """
     sb = get_supabase()
     student_id = StudentContext.get_student_id()
@@ -644,14 +890,17 @@ def get_student_payments(status: Optional[str] = None) -> str:
 
     lines = [f"{len(res.data)} paiement(s) :"]
     for p in res.data:
+        paid_info = f" (payé le {p['paid_at'][:10]})" if p.get("paid_at") else ""
         lines.append(
-            f"- {p.get('due_date', '?')} · {p['type']} · {p['amount']} TND "
-            f"· [{p['status']}] {p.get('description', '')}"
+            f"- {p.get('due_date', '?')[:10]} · {p['type']} · {p.get('amount', '?')} TND "
+            f"· [{p['status']}]{paid_info} {p.get('description', '')}"
         )
     return "\n".join(lines)
 
 
-# Liste de tous les tools exportés vers le LLM
+# ============================================
+# Export
+# ============================================
 ALL_TOOLS = [
     get_student_schedule,
     get_canteen_menu,

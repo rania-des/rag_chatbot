@@ -19,7 +19,7 @@ class Settings:
     #   qwen2.5:1.5b  (800 Mo — très rapide, ~5-10s,  tool calling OK)
     #   qwen2.5:3b    (1.9 Go — rapide,   ~15-25s, tool calling bon)
     #   qwen2.5:7b    (4.7 Go — lent CPU, ~35-45s, tool calling excellent)
-    OLLAMA_MODEL: str      = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+    OLLAMA_MODEL: str      = os.getenv("OLLAMA_MODEL", "qwen2.5:3b")
     OLLAMA_TEMPERATURE: float = float(os.getenv("OLLAMA_TEMPERATURE", "0.1"))
     OLLAMA_KEEP_ALIVE: Union[int, str] = _keep_alive()
     OLLAMA_NUM_PREDICT: int = int(os.getenv("OLLAMA_NUM_PREDICT", "300"))

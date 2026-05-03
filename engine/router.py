@@ -10,10 +10,11 @@ Ordre de priorité :
   4. FAQ     — similarité vectorielle ≥ seuil      → FAISS
   5. DYNAMIC — par défaut si rien ne matche assez
 
-Philosophie DYNAMIC :
-  Toute question dont la réponse DÉPEND de l'élève ou du MOMENT
-  doit passer par Supabase, même si la formulation est ambiguë.
-  Vaut mieux appeler un tool inutilement que rater une donnée réelle.
+Seuils FAQ (v2) :
+  - Seuil de base : 0.78 (au lieu de 0.88)
+  - Boost arabe   : +0.05 (E5 multilingue score l'arabe légèrement moins bien)
+  - Seuil effectif FR/EN : 0.78
+  - Seuil effectif AR    : 0.73  (0.78 - 0.05 boost)
 """
 from __future__ import annotations
 
@@ -35,20 +36,16 @@ class Route(str, Enum):
 
 
 # ══════════════════════════════════════════════════════════════════════
-# 1. GREET — réponse prédéfinie, 0 LLM, 0 Supabase
+# 1. GREET
 # ══════════════════════════════════════════════════════════════════════
 _GREET = re.compile(
     r"^\s*("
-    # Français
     r"bonjour|bonsoir|salut|coucou|bonne\s+journée|bonne\s+soirée|bonne\s+nuit|"
     r"bonne\s+matinée|bonne\s+année|bienvenue|au\s+revoir|à\s+bientôt|"
-    # Anglais
     r"hello|hi|hey|good\s+morning|good\s+afternoon|good\s+evening|good\s+night|"
     r"howdy|greetings|welcome|goodbye|bye|see\s+you|"
-    # Arabe standard
     r"مرحبا|أهلا|أهلاً|السلام\s+عليكم|وعليكم\s+السلام|صباح\s+الخير|"
     r"مساء\s+الخير|تصبح\s+على\s+خير|مرحباً|وداعاً|إلى\s+اللقاء|"
-    # Réponses courtes sans contexte
     r"oui|non|ok|d'accord|merci|شكرا|شكراً|عفواً|thanks|thank\s+you"
     r")\s*[!،,\.؟?]*\s*$",
     re.IGNORECASE | re.UNICODE,
@@ -87,156 +84,141 @@ def get_greet_response(query: str) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════
-# 2. DYNAMIC — tout ce qui nécessite Supabase
+# 2. DYNAMIC — données temps réel / personnelles
 #
-# Règle de conception :
-#   Si la réponse CORRECTE dépend de l'identité de l'élève OU du moment
-#   présent, c'est DYNAMIC. Mieux vaut sur-déclencher que rater.
+# IMPORTANT pour éviter les faux positifs :
+#   On ne met dans _DYNAMIC QUE des mots qui signalent une donnée
+#   qui CHANGE dans le temps ou dépend de l'élève.
+#   Les questions "comment faire X" ou "qu'est-ce que Y" sont FAQ.
 #
-# On couvre :
-#   - Cantine / repas / nourriture (menu = TOUJOURS dynamique)
-#   - Emploi du temps / planning / cours du jour
-#   - Notes / résultats / moyennes / bulletins
-#   - Absences / retards / présence
-#   - Devoirs / exercices à rendre
-#   - Annonces / actualités de classe
-#   - Réunions parents-profs
-#   - Paiements / frais en attente
-#   - Tout ce qui contient "aujourd'hui", "demain", "cette semaine", etc.
-#   - Pronoms personnels 1ère personne (mes, mon, ma, j'ai, je dois...)
+#   Règle des possessifs :
+#     "mes notes" → DYNAMIC (données perso)
+#     "comment sont calculées les notes" → FAQ (procédure)
 # ══════════════════════════════════════════════════════════════════════
 _DYNAMIC = re.compile(
     r"""
-    # ── CANTINE / REPAS (TOUJOURS dynamique — menu change chaque jour) ─────
+    # ── CANTINE / REPAS ────────────────────────────────────────────────────
     \b(
       menu|menus|cantine|canteen|cafétéria|cafeteria|
       manger|repas|plat|plats|déjeuner|dîner|lunch|dinner|
-      nourriture|food|cuisine|chef|self|réfectoire|
+      nourriture|food|réfectoire|
       qu[' ]est[- ]ce\s+qu[' ]il\s+y\s+a\s+[àa]\s+manger|
-      qu[' ]est[- ]ce\s+qu[' ]on\s+mange|
-      on\s+mange\s+quoi|il\s+y\s+a\s+quoi\s+[àa]\s+manger|
-      what[' ]s\s+for\s+(lunch|dinner|breakfast|eat)|
-      what\s+are\s+we\s+eating|
+      qu[' ]est[- ]ce\s+qu[' ]on\s+mange|on\s+mange\s+quoi|
+      il\s+y\s+a\s+quoi\s+[àa]\s+manger|
+      what[' ]s\s+for\s+(lunch|dinner|breakfast)|what\s+are\s+we\s+eating|
       مطعم|وجبة|أكل|طعام|غداء|عشاء|ماذا\s+نأكل|ماذا\s+يوجد\s+للأكل
     )\b |
 
-    # ── EMPLOI DU TEMPS / COURS DU JOUR ────────────────────────────────────
+    # ── EMPLOI DU TEMPS / COURS ─────────────────────────────────────────────
     \b(
-      emploi\s+du\s+temps|edt|horaires?\s+(de\s+)?(cours|classe|mes\s+cours)|planning|plan\s+de\s+cours|
-      cours\s+(de\s+la\s+)?journée|programme\s+(de\s+la\s+)?journée|
+      emploi\s+du\s+temps|edt|planning|plan\s+de\s+cours|
       mes\s+cours|j[' ]ai\s+cours|j[' ]ai\s+quoi|qu[' ]est[- ]ce\s+que\s+j[' ]ai|
-      quelle\s+heure\s+commence|à\s+quelle\s+heure|jusqu[' ]à\s+quelle\s+heure|
-      schedule|timetable|class\s+schedule|my\s+classes|today[' ]s\s+class|
+      quelle\s+heure\s+commence|à\s+quelle\s+heure\s+(commence|finit|j[' ]ai)|
+      schedule|timetable|my\s+classes|today[' ]s\s+class|
       when\s+(do\s+i\s+have|is\s+my)\s+class|what\s+(class|course)\s+do\s+i\s+have|
-      جدول|جدولي|حصص|حصتي|مواعيد\s+الدراسة|متى\s+(عندي|لدي)\s+(حصة|درس)
+      جدولي|حصتي|مواعيد\s+الدراسة|متى\s+(عندي|لدي)\s+(حصة|درس)
     )\b |
 
-    # ── NOTES / RÉSULTATS / MOYENNE ─────────────────────────────────────────
+    # ── NOTES / RÉSULTATS (données PERSONNELLES) ─────────────────────────────
+    # "note" seul ne suffit pas — doit être accompagné d'un possessif ou d'un verbe perso
     \b(
-      note|notes|résultat|résultats|moyenne|moyennes|bulletin|bulletins|
-      bilan\s+scolaire|relevé\s+de\s+notes|score|scores|
-      j[' ]ai\s+eu|j[' ]ai\s+obtenu|combien\s+j[' ]ai\s+eu|ma\s+note|
-      mes\s+résultats|mon\s+bulletin|quelle\s+est\s+ma\s+moyenne|
-      grade|grades|result|results|average|gpa|transcript|report\s+card|
+      mes\s+notes?|ma\s+note|ma\s+moyenne|mes\s+moyennes?|
+      mes\s+résultats?|mon\s+bulletin|mon\s+relevé|
+      j[' ]ai\s+eu|j[' ]ai\s+obtenu|combien\s+j[' ]ai\s+eu|
+      quelle\s+est\s+ma\s+moyenne|
+      my\s+(grade|grades|result|results|average|gpa|transcript)|
       how\s+did\s+i\s+do|what\s+(grade|score)\s+did\s+i\s+get|
-      درجة|درجاتي|نقطة|نقاطي|معدل|نتيجة|نتائجي|كشف\s+النقاط
+      درجاتي|نقاطي|معدلي|نتائجي|كشف\s+النقاط\s+(الخاص\s+بي)?
     )\b |
 
-    # ── ABSENCES / PRÉSENCE / RETARDS ───────────────────────────────────────
+    # ── ABSENCES / RETARDS (données PERSONNELLES) ────────────────────────────
     \b(
-      absence|absences|absent|présence|présences|retard|retards|
-      j[' ]ai\s+(combien\s+d[' ])?absences?|mes\s+absences?|
+      mes\s+absences?|mes\s+retards?|j[' ]ai\s+(combien\s+d[' ])?absences?|
       suis[- ]je\s+absent|ai[- ]je\s+(des\s+)?absences?|
       combien\s+de\s+fois\s+(j[' ]ai\s+)?(été\s+)?absent|
-      attendance|absent|tardiness|late|
-      am\s+i\s+absent|do\s+i\s+have\s+any\s+absences?|
-      غياب|غياباتي|تأخر|تأخراتي|حضور|هل\s+تغيبت
+      my\s+(attendance|absence|absences)|am\s+i\s+absent|
+      do\s+i\s+have\s+any\s+absences?|how\s+many\s+times\s+(was\s+i|did\s+i)\s+absent|
+      غيابي|غياباتي|تأخري|هل\s+تغيبت|كم\s+مرة\s+تغيبت
     )\b |
 
-    # ── DEVOIRS / EXERCICES À RENDRE ────────────────────────────────────────
+    # ── DEVOIRS (données PERSONNELLES) ──────────────────────────────────────
     \b(
-      devoir|devoirs|exercice|exercices|travail\s+à\s+rendre|tâche|tâches|
-      rendre|à\s+remettre|délai|date\s+limite|
-      qu[' ]est[- ]ce\s+que\s+j[' ]ai\s+à\s+faire|qu[' ]est[- ]ce\s+qu[' ]il\s+faut\s+rendre|
-      homework|assignment|assignments|due\s+date|deadline|
-      what\s+(homework|assignment)\s+do\s+i\s+have|what\s+is\s+due|
-      واجب|واجباتي|تمرين|مهام|ما\s+الذي\s+(علي|يجب\s+علي)\s+تسليمه
+      mes\s+devoirs?|j[' ]ai\s+(un\s+devoir|des\s+devoirs)|
+      qu[' ]est[- ]ce\s+que\s+j[' ]ai\s+à\s+(faire|rendre)|
+      qu[' ]est[- ]ce\s+qu[' ]il\s+faut\s+rendre|à\s+remettre|
+      my\s+(homework|assignment)|what\s+homework\s+do\s+i\s+have|what\s+is\s+due|
+      واجبي|واجباتي|ما\s+(الذي\s+)?(علي|يجب\s+علي)\s+تسليمه
     )\b |
 
-    # ── ANNONCES / ACTUALITÉS ───────────────────────────────────────────────
+    # ── ANNONCES ─────────────────────────────────────────────────────────────
     \b(
-      annonce|annonces|actualité|actualités|notification|notifications|
-      nouveauté|nouveautés|quoi\s+de\s+neuf|informations?\s+importantes?|
-      news|announcement|announcements|updates?|what[' ]s\s+new|
+      annonces?|actualités?|quoi\s+de\s+neuf|informations?\s+importantes?|
+      announcement|news|updates?|what[' ]s\s+new|
       إعلان|إعلانات|أخبار|مستجدات|ما\s+الجديد
     )\b |
 
-    # ── RÉUNIONS PARENTS-PROFS ──────────────────────────────────────────────
+    # ── RÉUNIONS ──────────────────────────────────────────────────────────────
+    # Note : "réunion" sans possessif peut être FAQ → on exige un signal perso
     \b(
-      réunion|réunions|rencontre|rendez[- ]vous|rdv|conseil\s+de\s+classe|
-      réunion\s+parents|parents[- ]profs|prochaine\s+réunion|
-      meeting|meetings|appointment|parent[- ]teacher|
-      اجتماع|اجتماعاتي|موعد|مواعيد|لقاء\s+(الأولياء|الآباء)
+      mes\s+réunions?|ma\s+prochaine\s+réunion|
+      rendez[- ]vous\s+(parents?|avec\s+le\s+prof)|conseil\s+de\s+classe|
+      my\s+(meeting|appointment)|
+      اجتماعاتي|موعد\s+(مع\s+المعلم|الأولياء)|لقاء\s+(الأولياء|الآباء)
     )\b |
 
-    # ── PAIEMENTS / FRAIS ───────────────────────────────────────────────────
+    # ── PAIEMENTS ────────────────────────────────────────────────────────────
     \b(
-      paiement|paiements|facture|factures|frais|solde|
-      dois[- ]je\s+payer|est[- ]ce\s+que\s+j[' ]ai\s+payé|
-      montant\s+dû|reste\s+à\s+payer|en\s+attente\s+de\s+paiement|
-      payment|payments|fee|fees|invoice|tuition|balance\s+due|
-      مدفوعات|رسوم|فاتورة|ما\s+(يجب|عليّ)\s+دفعه|رصيد
+      mes\s+paiements?|est[- ]ce\s+que\s+j[' ]ai\s+payé|
+      dois[- ]je\s+payer|montant\s+dû|reste\s+à\s+payer|
+      my\s+(payment|fee|invoice)|do\s+i\s+owe|
+      مدفوعاتي|هل\s+دفعت|ما\s+(يجب\s+علي)\s+دفعه
     )\b |
 
-    # ── TEMPORALITÉ — impose une donnée en temps réel ───────────────────────
+    # ── TEMPORALITÉ (impose données temps réel) ───────────────────────────────
     \b(
       aujourd[' ]hui|ce\s+matin|ce\s+midi|ce\s+soir|maintenant|
-      demain|après[- ]demain|
-      hier|avant[- ]hier|
+      demain|après[- ]demain|hier|avant[- ]hier|
       cette\s+semaine|la\s+semaine\s+prochaine|la\s+semaine\s+dernière|
-      ce\s+mois[- ]ci|ce\s+trimestre|ce\s+semestre|
+      ce\s+mois[- ]ci|ce\s+trimestre|
       lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche|
       today|tomorrow|yesterday|this\s+week|next\s+week|last\s+week|
       this\s+month|monday|tuesday|wednesday|thursday|friday|saturday|sunday|
       اليوم|الآن|غداً?|أمس|هذا\s+الأسبوع|الأسبوع\s+القادم|الأسبوع\s+الماضي|
-      الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت|الأحد
-    )\b |
-
-    # ── POSSESSIFS 1ÈRE PERSONNE ────────────────────────────────────────────
-    \bmes\s+(notes?|devoirs?|absences?|cours|retards?|paiements?|
-             réunions?|moyennes?|résultats?|professeurs?)\b |
-    \bmon\s+(emploi|bulletin|résultat|prof|professeur)\b |
-    \bma\s+(note|moyenne|classe)\b |
-    \bj[' ]ai\s+(combien|quoi|cours|un\s+devoir|des\s+absences?|payé)\b |
-    \bje\s+(dois|veux\s+voir|voudrais\s+voir|souhaite\s+voir|vais\s+avoir)\b |
-    \best[- ]ce\s+que\s+j[' ]ai\b |
-    \bai[- ]je\b |
-    \bmy\s+(grade|grades|schedule|class|homework|assignment|
-             attendance|absence|result|average|payment)\b |
-    \b(do|did)\s+i\s+(have|get|pass)\b |
-    \bعندي\b | \bلدي\b | \bدرجاتي\b | \bجدولي\b | \bغيابي\b | \bواجبي\b |
-    \bنقاطي\b | \bمعدلي\b | \bمدفوعاتي\b
+      الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت|الأحد|
+      lyoum|elyoum|ghodwa|bokra|lbereh|hal\s+jem3a|hal\s+chhar
+    )\b
     """,
     re.IGNORECASE | re.UNICODE | re.VERBOSE,
 )
 
-# Mots qui signalent une question admin même quand un cours est actif
-# → force le passage en DYNAMIC plutôt que COURSE
+# Questions admin qui forcent DYNAMIC même si un cours est actif
 _ADMIN = re.compile(
     r"\b("
-    r"menu|cantine|canteen|cafétéria|manger|repas|nourriture|food|"
-    r"note|notes|résultat|résultats|moyenne|bulletin|grade|grades|"
+    r"menu|cantine|canteen|manger|repas|nourriture|food|"
+    r"mes\s+notes?|mes\s+résultats?|ma\s+moyenne|mon\s+bulletin|"
     r"emploi\s+du\s+temps|horaire|schedule|timetable|planning|"
-    r"absence|absences|retard|attendance|"
-    r"devoir|devoirs|homework|assignment|"
-    r"paiement|paiements|payment|frais|fee|"
-    r"réunion|meeting|annonce|announcement|"
-    r"مطعم|وجبة|درجة|جدول|غياب|واجب|مدفوعات|إعلان"
+    r"mes\s+absences?|mes\s+retards?|attendance|"
+    r"mes\s+devoirs?|homework|assignment|"
+    r"mes\s+paiements?|payment|frais|fee|"
+    r"mes\s+réunions?|meeting|mes\s+annonces?|announcement|"
+    r"مطعم|وجبة|درجاتي|جدولي|غياباتي|واجباتي|مدفوعاتي|إعلانات"
     r")\b",
     re.IGNORECASE | re.UNICODE,
 )
 
-_FAQ_THRESHOLD = max(0.88, settings.FAQ_SIMILARITY_THRESHOLD)
+# ── Détection de langue (pour le boost arabe) ────────────────────────────────
+def _is_arabic(text: str) -> bool:
+    return bool(re.search(r"[\u0600-\u06FF]", text))
+
+
+# ── Seuil FAQ ────────────────────────────────────────────────────────────────
+# FIX : utiliser directement la valeur du settings (plus de max() qui bloque)
+# Valeur recommandée dans .env : FAQ_SIMILARITY_THRESHOLD=0.78
+_FAQ_THRESHOLD_BASE = getattr(settings, "FAQ_SIMILARITY_THRESHOLD", 0.78)
+
+# Boost arabe : E5 multilingue score l'arabe ~0.05 en dessous du FR pour
+# des questions sémantiquement équivalentes → on abaisse le seuil pour l'arabe
+_FAQ_ARABIC_BOOST = 0.06  # seuil effectif arabe = base - 0.06
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -251,19 +233,14 @@ class Router:
         query: str,
         course_id: Optional[str] = None,
     ) -> Tuple[Route, Optional[Document], float]:
-        """
-        Retourne (route, faq_doc_ou_None, score).
-        Aucun appel LLM — 100% règles.
-        """
         q = query.strip()
 
-        # 1. GREET — salutation / message très court sans contenu
+        # 1. GREET
         if _GREET.match(q):
             print(f"[Router] 👋 GREET: {q!r}")
             return Route.GREET, None, 0.0
 
-        # 2. COURSE — cours uploadé actif et question pédagogique
-        #    (si la question parle aussi de données admin → DYNAMIC quand même)
+        # 2. COURSE — cours uploadé actif, question pédagogique
         if course_id and not _ADMIN.search(q):
             print(f"[Router] 📚 COURSE: course_id={course_id}")
             return Route.COURSE, None, 0.0
@@ -273,15 +250,41 @@ class Router:
             print(f"[Router] ⚡ DYNAMIC (keyword): {q[:80]!r}")
             return Route.DYNAMIC, None, 0.0
 
-        # 4. FAQ — recherche vectorielle avec seuil haut
+        # 4. FAQ — recherche vectorielle avec seuil adaptatif
+        #
+        # Seuil adaptatif selon la langue :
+        #   - FR / EN : _FAQ_THRESHOLD_BASE         (ex: 0.78)
+        #   - Arabe   : _FAQ_THRESHOLD_BASE - boost  (ex: 0.72)
+        #
+        # Pourquoi un seuil plus bas pour l'arabe ?
+        #   L'encodeur E5 multilingue est entraîné majoritairement sur du texte
+        #   latin. Pour des questions arabes sémantiquement identiques aux FAQs,
+        #   il produit des scores ~0.04-0.07 inférieurs. Sans ce boost, des FAQs
+        #   arabes valides (score ~0.83-0.85) sont envoyées en DYNAMIC par erreur.
+        is_ar = _is_arabic(q)
+        threshold = (
+            _FAQ_THRESHOLD_BASE - _FAQ_ARABIC_BOOST
+            if is_ar
+            else _FAQ_THRESHOLD_BASE
+        )
+
         match = self._faq.best_match(q)
         if match:
             doc, score = match
-            if score >= _FAQ_THRESHOLD:
-                print(f"[Router] 📖 FAQ (score={score:.3f}): {q[:80]!r}")
+            if score >= threshold:
+                lang_tag = "AR" if is_ar else "FR/EN"
+                print(
+                    f"[Router] 📖 FAQ ({lang_tag}, score={score:.3f}≥{threshold:.3f}): "
+                    f"{q[:80]!r}"
+                )
                 return Route.FAQ, doc, score
+            else:
+                print(
+                    f"[Router] ℹ️  FAQ score trop bas ({score:.3f}<{threshold:.3f}) "
+                    f"→ DYNAMIC: {q[:60]!r}"
+                )
 
-        # 5. DYNAMIC par défaut — mieux que risquer une FAQ incorrecte
+        # 5. DYNAMIC par défaut
         print(
             f"[Router] ⚡ DYNAMIC (default, score={match[1] if match else 0:.3f}): "
             f"{q[:80]!r}"

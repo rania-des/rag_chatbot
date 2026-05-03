@@ -4,17 +4,17 @@ Routeur hybride — 4 branches : GREET, FAQ, DYNAMIC, COURSE.
 Logique ENTIÈREMENT basée sur règles (0 appel LLM pour le routage).
 
 Ordre de priorité :
-  1. GREET   — salutations simples (regex)         → réponse instantanée
-  2. COURSE  — course_id fourni + question pédago  → RAG sur cours
-  3. DYNAMIC — mots-clés données BD / personnels   → Supabase
-  4. FAQ     — similarité vectorielle ≥ seuil      → FAISS
+  1. GREET   — salutations simples (regex ou mots clés) → réponse instantanée
+  2. COURSE  — course_id fourni + question pédagogique → RAG sur cours
+  3. DYNAMIC — mots-clés données BD / personnels → Supabase
+  4. FAQ     — similarité vectorielle ≥ seuil (adaptatif selon langue) → FAISS
   5. DYNAMIC — par défaut si rien ne matche assez
 
-Seuils FAQ (v2) :
-  - Seuil de base : 0.78 (au lieu de 0.88)
-  - Boost arabe   : +0.05 (E5 multilingue score l'arabe légèrement moins bien)
+Seuils FAQ (v2 améliorée) :
+  - Seuil de base : 0.78 (configurable via settings.FAQ_SIMILARITY_THRESHOLD)
+  - Boost arabe   : -0.06 (car E5 multilingue sous-score l'arabe)
   - Seuil effectif FR/EN : 0.78
-  - Seuil effectif AR    : 0.73  (0.78 - 0.05 boost)
+  - Seuil effectif AR    : 0.72
 """
 from __future__ import annotations
 
@@ -36,9 +36,96 @@ class Route(str, Enum):
 
 
 # ══════════════════════════════════════════════════════════════════════
-# 1. GREET
+# 0. NORMALISATION DES ABRÉVIATIONS (version binôme)
 # ══════════════════════════════════════════════════════════════════════
-_GREET = re.compile(
+_ABREVIATIONS = {
+    # Français SMS
+    "pb": "problème",
+    "stp": "s'il te plaît",
+    "svp": "s'il vous plaît",
+    "msg": "message",
+    "rdv": "rendez-vous",
+    "tjrs": "toujours",
+    "bcp": "beaucoup",
+    "dc": "donc",
+    "pk": "pourquoi",
+    "pcq": "parce que",
+    "qd": "quand",
+    "ac": "avec",
+    "ss": "sans",
+    "tt": "tout",
+    "ts": "tous",
+    "nv": "nouveau",
+    "mtn": "maintenant",
+    "auj": "aujourd'hui",
+    "dem": "demain",
+    "exerc": "exercice",
+    "exo": "exercice",
+    "exos": "exercices",
+    "correcc": "correction",
+    "corec": "correction",
+    "explic": "explication",
+    "ds": "dans",
+    "pr": "pour",
+    "vs": "vous",
+    "ct": "c'était",
+    "jvx": "je veux",
+    "jsp": "je ne sais pas",
+    "chui": "je suis",
+    "g": "j'ai",
+    "ya": "il y a",
+    "kelke": "quelque",
+    # Abréviations scolaires
+    "maths": "mathématiques",
+    "svt": "sciences de la vie et de la terre",
+    "eps": "éducation physique",
+    "em": "emploi du temps",
+    "edt": "emploi du temps",
+    "interro": "interrogation",
+    "controle": "contrôle",
+    "dm": "devoir maison",
+    "tp": "travaux pratiques",
+    "td": "travaux dirigés",
+    "cours": "cours",
+    "notes": "notes",
+    "abs": "absences",
+    "absences": "absences",
+    "devoirs": "devoirs",
+    "menu": "menu",
+    "cantine": "cantine",
+    "heure": "heure",
+    "planning": "planning",
+    "schedule": "emploi du temps",
+    "grade": "note",
+    "grades": "notes",
+}
+
+
+def _normalize(text: str) -> str:
+    """Remplace les abréviations par leur forme complète pour le matching."""
+    words = re.findall(r"[\w'\-]+|[^\w\s]", text, re.UNICODE)
+    result = []
+    for w in words:
+        if re.match(r"[\w'\-]+$", w):
+            w_lower = w.lower()
+            if w_lower in _ABREVIATIONS:
+                result.append(_ABREVIATIONS[w_lower])
+            else:
+                result.append(w)
+        else:
+            result.append(w)
+    normalized = ""
+    for i, w in enumerate(result):
+        if i > 0 and not re.match(r"^[.,!?;:)]$", w):
+            normalized += " "
+        normalized += w
+    return normalized
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 1. GREET — réponse prédéfinie, 0 LLM, 0 Supabase
+# ══════════════════════════════════════════════════════════════════════
+_GREET_REGEX = re.compile(
     r"^\s*("
     r"bonjour|bonsoir|salut|coucou|bonne\s+journée|bonne\s+soirée|bonne\s+nuit|"
     r"bonne\s+matinée|bonne\s+année|bienvenue|au\s+revoir|à\s+bientôt|"
@@ -50,6 +137,20 @@ _GREET = re.compile(
     r")\s*[!،,\.؟?]*\s*$",
     re.IGNORECASE | re.UNICODE,
 )
+
+# Ensemble des mots pour reconnaissance des phrases courtes (rajout utilisateur)
+_GREET_WORDS = {
+    "bonjour", "bonsoir", "salut", "coucou", "merci", "d'accord", "ok",
+    "oui", "non", "thanks", "thank", "you", "bye", "hello", "hi", "hey",
+    "مرحبا", "شكرا", "عفواً", "تمام", "حسناً", "نعم", "لا",
+}
+
+def _is_greet_phrase(text: str) -> bool:
+    """Détecte les phrases courtes (1 à 5 mots) dont tous les mots sont dans _GREET_WORDS."""
+    cleaned = re.sub(r"[^\w\s']", " ", text.lower())
+    words = cleaned.split()
+    return 1 <= len(words) <= 5 and all(w in _GREET_WORDS for w in words)
+
 
 GREET_RESPONSES = {
     "ar": (
@@ -74,7 +175,7 @@ GREET_RESPONSES = {
 def _greet_lang(query: str) -> str:
     if re.search(r"[\u0600-\u06FF]", query):
         return "ar"
-    if re.search(r"\b(hello|hi|hey|good|morning|evening|bye|thanks)\b", query, re.I):
+    if re.search(r"\b(hello|hi|hey|good|morning|evening|bye|thanks|thank)\b", query, re.I):
         return "en"
     return "fr"
 
@@ -84,16 +185,7 @@ def get_greet_response(query: str) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════
-# 2. DYNAMIC — données temps réel / personnelles
-#
-# IMPORTANT pour éviter les faux positifs :
-#   On ne met dans _DYNAMIC QUE des mots qui signalent une donnée
-#   qui CHANGE dans le temps ou dépend de l'élève.
-#   Les questions "comment faire X" ou "qu'est-ce que Y" sont FAQ.
-#
-#   Règle des possessifs :
-#     "mes notes" → DYNAMIC (données perso)
-#     "comment sont calculées les notes" → FAQ (procédure)
+# 2. DYNAMIC — données temps réel / personnelles / mémoire
 # ══════════════════════════════════════════════════════════════════════
 _DYNAMIC = re.compile(
     r"""
@@ -120,7 +212,6 @@ _DYNAMIC = re.compile(
     )\b |
 
     # ── NOTES / RÉSULTATS (données PERSONNELLES) ─────────────────────────────
-    # "note" seul ne suffit pas — doit être accompagné d'un possessif ou d'un verbe perso
     \b(
       mes\s+notes?|ma\s+note|ma\s+moyenne|mes\s+moyennes?|
       mes\s+résultats?|mon\s+bulletin|mon\s+relevé|
@@ -158,7 +249,6 @@ _DYNAMIC = re.compile(
     )\b |
 
     # ── RÉUNIONS ──────────────────────────────────────────────────────────────
-    # Note : "réunion" sans possessif peut être FAQ → on exige un signal perso
     \b(
       mes\s+réunions?|ma\s+prochaine\s+réunion|
       rendez[- ]vous\s+(parents?|avec\s+le\s+prof)|conseil\s+de\s+classe|
@@ -186,7 +276,31 @@ _DYNAMIC = re.compile(
       اليوم|الآن|غداً?|أمس|هذا\s+الأسبوع|الأسبوع\s+القادم|الأسبوع\s+الماضي|
       الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت|الأحد|
       lyoum|elyoum|ghodwa|bokra|lbereh|hal\s+jem3a|hal\s+chhar
-    )\b
+    )\b |
+
+    # ── MÉMOIRE LONG-TERME / SOUVENIRS ──────────────────────────────────────
+    \b(
+      souvien|souviens|rappelle|rappelles|rappel|dernière\s+fois|on\s+a\s+parlé|
+      précédemment|avant|hier\s+(on|tu|j[' ]ai)|tu\s+te\s+souviens|est-ce\s+que\s+tu\s+te\s+souviens|
+      dernière\s+discussion|dernier\s+topic|notre\s+conversation|
+      remember|last\s+time|we\s+talked|last\s+discussion|do\s+you\s+remember|
+      تذكر|هل\s+تذكر|آخر\s+مرة|سبق\s+وتحدثنا|محادثتنا
+    )\b |
+
+    # ── POSSESSIFS 1ÈRE PERSONNE ────────────────────────────────────────────
+    \bmes\s+(notes?|devoirs?|absences?|cours|retards?|paiements?|
+             réunions?|moyennes?|résultats?|professeurs?)\b |
+    \bmon\s+(emploi|bulletin|résultat|prof|professeur)\b |
+    \bma\s+(note|moyenne|classe)\b |
+    \bj[' ]ai\s+(combien|quoi|cours|un\s+devoir|des\s+absences?|payé)\b |
+    \bje\s+(dois|veux\s+voir|voudrais\s+voir|souhaite\s+voir|vais\s+avoir)\b |
+    \best[- ]ce\s+que\s+j[' ]ai\b |
+    \bai[- ]je\b |
+    \bmy\s+(grade|grades|schedule|class|homework|assignment|
+             attendance|absence|result|average|payment)\b |
+    \b(do|did)\s+i\s+(have|get|pass)\b |
+    \bعندي\b | \bلدي\b | \bدرجاتي\b | \bجدولي\b | \bغيابي\b | \bواجبي\b |
+    \bنقاطي\b | \bمعدلي\b | \bمدفوعاتي\b
     """,
     re.IGNORECASE | re.UNICODE | re.VERBOSE,
 )
@@ -197,11 +311,12 @@ _ADMIN = re.compile(
     r"menu|cantine|canteen|manger|repas|nourriture|food|"
     r"mes\s+notes?|mes\s+résultats?|ma\s+moyenne|mon\s+bulletin|"
     r"emploi\s+du\s+temps|horaire|schedule|timetable|planning|"
-    r"mes\s+absences?|mes\s+retards?|attendance|"
-    r"mes\s+devoirs?|homework|assignment|"
-    r"mes\s+paiements?|payment|frais|fee|"
-    r"mes\s+réunions?|meeting|mes\s+annonces?|announcement|"
-    r"مطعم|وجبة|درجاتي|جدولي|غياباتي|واجباتي|مدفوعاتي|إعلانات"
+    r"absence|absences|retard|attendance|"
+    r"devoir|devoirs|homework|assignment|"
+    r"paiement|paiements|payment|frais|fee|"
+    r"réunion|meeting|annonce|announcement|"
+    r"souvien|souviens|rappelle|remember|last\s+time|"
+    r"مطعم|وجبة|درجة|جدول|غياب|واجب|مدفوعات|إعلان|تذكر"
     r")\b",
     re.IGNORECASE | re.UNICODE,
 )
@@ -210,14 +325,8 @@ _ADMIN = re.compile(
 def _is_arabic(text: str) -> bool:
     return bool(re.search(r"[\u0600-\u06FF]", text))
 
-
-# ── Seuil FAQ ────────────────────────────────────────────────────────────────
-# FIX : utiliser directement la valeur du settings (plus de max() qui bloque)
-# Valeur recommandée dans .env : FAQ_SIMILARITY_THRESHOLD=0.78
+# ── Seuil FAQ (version adaptative) ────────────────────────────────────────────
 _FAQ_THRESHOLD_BASE = getattr(settings, "FAQ_SIMILARITY_THRESHOLD", 0.78)
-
-# Boost arabe : E5 multilingue score l'arabe ~0.05 en dessous du FR pour
-# des questions sémantiquement équivalentes → on abaisse le seuil pour l'arabe
 _FAQ_ARABIC_BOOST = 0.06  # seuil effectif arabe = base - 0.06
 
 
@@ -232,12 +341,23 @@ class Router:
         self,
         query: str,
         course_id: Optional[str] = None,
+        memory_profile: str = "",  # non utilisé actuellement, réservé
     ) -> Tuple[Route, Optional[Document], float]:
-        q = query.strip()
+        """
+        Retourne (route, faq_doc_ou_None, score).
+        Aucun appel LLM — 100% règles.
+        """
+        # Normalisation des abréviations
+        q_original = query.strip()
+        q_normalized = _normalize(q_original)
+        q = q_normalized  # on utilise la version normalisée pour le matching
 
-        # 1. GREET
-        if _GREET.match(q):
-            print(f"[Router] 👋 GREET: {q!r}")
+        if q_normalized != q_original:
+            print(f"[Router] 🔧 Normalisation: {q_original[:50]}... → {q_normalized[:50]}...")
+
+        # 1. GREET (regex ou phrase courte)
+        if _GREET_REGEX.match(q) or _is_greet_phrase(q_original):
+            print(f"[Router] 👋 GREET: {q_original!r}")
             return Route.GREET, None, 0.0
 
         # 2. COURSE — cours uploadé actif, question pédagogique
@@ -245,49 +365,39 @@ class Router:
             print(f"[Router] 📚 COURSE: course_id={course_id}")
             return Route.COURSE, None, 0.0
 
-        # 3. DYNAMIC — mot-clé données BD / personnel / temporel
+        # 3. DYNAMIC — mot-clé données BD / personnel / temporel / mémoire
         if _DYNAMIC.search(q):
-            print(f"[Router] ⚡ DYNAMIC (keyword): {q[:80]!r}")
+            print(f"[Router] ⚡ DYNAMIC (keyword): {q_original[:80]!r}")
             return Route.DYNAMIC, None, 0.0
 
-        # 4. FAQ — recherche vectorielle avec seuil adaptatif
-        #
-        # Seuil adaptatif selon la langue :
-        #   - FR / EN : _FAQ_THRESHOLD_BASE         (ex: 0.78)
-        #   - Arabe   : _FAQ_THRESHOLD_BASE - boost  (ex: 0.72)
-        #
-        # Pourquoi un seuil plus bas pour l'arabe ?
-        #   L'encodeur E5 multilingue est entraîné majoritairement sur du texte
-        #   latin. Pour des questions arabes sémantiquement identiques aux FAQs,
-        #   il produit des scores ~0.04-0.07 inférieurs. Sans ce boost, des FAQs
-        #   arabes valides (score ~0.83-0.85) sont envoyées en DYNAMIC par erreur.
-        is_ar = _is_arabic(q)
+        # 4. FAQ — recherche vectorielle avec seuil adaptatif (selon la langue)
+        is_ar = _is_arabic(q_original)
         threshold = (
             _FAQ_THRESHOLD_BASE - _FAQ_ARABIC_BOOST
             if is_ar
             else _FAQ_THRESHOLD_BASE
         )
 
-        match = self._faq.best_match(q)
+        match = self._faq.best_match(q_original)  # on utilise l'original pour la FAQ
         if match:
             doc, score = match
             if score >= threshold:
                 lang_tag = "AR" if is_ar else "FR/EN"
                 print(
                     f"[Router] 📖 FAQ ({lang_tag}, score={score:.3f}≥{threshold:.3f}): "
-                    f"{q[:80]!r}"
+                    f"{q_original[:80]!r}"
                 )
                 return Route.FAQ, doc, score
             else:
                 print(
                     f"[Router] ℹ️  FAQ score trop bas ({score:.3f}<{threshold:.3f}) "
-                    f"→ DYNAMIC: {q[:60]!r}"
+                    f"→ DYNAMIC: {q_original[:60]!r}"
                 )
 
         # 5. DYNAMIC par défaut
         print(
             f"[Router] ⚡ DYNAMIC (default, score={match[1] if match else 0:.3f}): "
-            f"{q[:80]!r}"
+            f"{q_original[:80]!r}"
         )
         return Route.DYNAMIC, None, match[1] if match else 0.0
 

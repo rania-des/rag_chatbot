@@ -180,9 +180,62 @@ def _greet_lang(query: str) -> str:
     return "fr"
 
 
-def get_greet_response(query: str) -> str:
-    return GREET_RESPONSES[_greet_lang(query)]
+# Réponses courtes pour les remerciements/acquiescements/au revoir
+ACK_RESPONSES = {
+    "fr": {
+        "merci": "De rien !",
+        "thanks": "De rien !",
+        "ok": "Parfait !",
+        "d'accord": "D'accord !",
+        "oui": "Très bien.",
+        "non": "D'accord.",
+        "bye": "Au revoir ! 👋",
+    },
+    "en": {
+        "merci": "You're welcome!",
+        "thanks": "You're welcome!",
+        "ok": "Great!",
+        "d'accord": "Okay!",
+        "oui": "Alright.",
+        "non": "Understood.",
+        "bye": "Goodbye! 👋",
+    },
+    "ar": {
+        "merci": "عفواً!",
+        "thanks": "عفواً!",
+        "ok": "تمام!",
+        "d'accord": "حسناً!",
+        "oui": "جيد.",
+        "non": "مفهوم.",
+        "bye": "مع السلامة! 👋",
+    }
+}
 
+def get_greet_response(query: str) -> str:
+    """
+    Retourne la réponse appropriée selon le message :
+    - vrais salutations → message d'accueil complet
+    - remerciements / acquiescements / au revoir → réponse courte
+    """
+    lang = _greet_lang(query)
+    q_lower = query.strip().lower()
+
+    # Détection des remerciements
+    if q_lower in ("merci","merci beaucoup","thanks","thank you", "شكرا", "شكراً"):
+        return ACK_RESPONSES[lang].get("merci", "De rien !")
+    # Détection des acquiescements (ok, oui, non, d'accord)
+    if q_lower in ("ok", "d'accord", "okay", "تمام", "حسناً"):
+        return ACK_RESPONSES[lang].get("ok", "Parfait !")
+    if q_lower in ("oui", "yes", "نعم"):
+        return ACK_RESPONSES[lang].get("oui", "Très bien.")
+    if q_lower in ("non", "no", "لا"):
+        return ACK_RESPONSES[lang].get("non", "D'accord.")
+    # Détection des au revoir
+    if q_lower in ("bye", "au revoir", "goodbye", "مع السلامة", "وداعاً"):
+        return ACK_RESPONSES[lang].get("bye", "Au revoir ! 👋")
+
+    # Par défaut : salutation complète
+    return GREET_RESPONSES[lang]
 
 # ══════════════════════════════════════════════════════════════════════
 # 2. DYNAMIC — données temps réel / personnelles / mémoire
@@ -322,6 +375,33 @@ _ADMIN = re.compile(
 )
 
 # ── Détection de langue (pour le boost arabe) ────────────────────────────────
+
+# ── Détection de questions de suivi court ────────────────────────────────────
+_SHORT_FOLLOWUP = re.compile(
+    r"^\s*(et\s+)?"
+    r"("
+    # Changement de langue explicite — liste fermée
+    r"(en\s+)?(français|french|anglais|english|arabe|arabic)|"
+    r"(بال)?(عربية|عربي|فرنسية|فرنسي|إنجليزية|إنجليزي)|"
+    r"in\s+(french|english|arabic)|"
+    # "et pour [matière]" — doit commencer par "pour" ou "en"
+    r"(pour\s+|en\s+)[a-zàâäéèêëïîôùûüç]{3,25}"
+    r")"
+    r"\s*[?؟!]?\s*$",
+    re.IGNORECASE | re.UNICODE,
+)
+
+def _is_short_followup(text: str) -> bool:
+    """
+    Détecte les demandes de changement de langue ou de matière sans topic.
+    Ex: "et en français ?", "en anglais", "بالعربية", "et pour les maths ?"
+    Ces questions font référence au contexte précédent → DYNAMIC.
+    """
+    words = text.split()
+    if len(words) > 6:
+        return False
+    return bool(_SHORT_FOLLOWUP.match(text))
+
 def _is_arabic(text: str) -> bool:
     return bool(re.search(r"[\u0600-\u06FF]", text))
 
@@ -368,6 +448,13 @@ class Router:
         # 3. DYNAMIC — mot-clé données BD / personnel / temporel / mémoire
         if _DYNAMIC.search(q):
             print(f"[Router] ⚡ DYNAMIC (keyword): {q_original[:80]!r}")
+            return Route.DYNAMIC, None, 0.0
+
+        # 3.5 SUIVI COURT — question sans topic qui référence le contexte
+        # Ex: "et en français ?", "et en arabe ?", "et pour maths ?"
+        # Ces questions doivent aller en DYNAMIC (avec historique) et NON en FAQ
+        if _is_short_followup(q):
+            print(f"[Router] 🔗 SUIVI COURT → DYNAMIC: {q_original!r}")
             return Route.DYNAMIC, None, 0.0
 
         # 4. FAQ — recherche vectorielle avec seuil adaptatif (selon la langue)

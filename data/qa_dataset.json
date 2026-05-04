@@ -1344,4 +1344,603 @@
       "Can both parents access it?"
     ]
   }
+,
+  {
+    "id": "CHAT_001_fr",
+    "lang": "fr",
+    "category": "Chatbot & Plateforme",
+    "question": "À quoi sert le chatbot ?",
+    "answer": "Le chatbot vous permet de consulter vos informations scolaires en langage naturel : emploi du temps, notes, absences, menu de la cantine, devoirs à rendre et annonces. Il peut aussi vous aider à comprendre un cours si vous uploadez le fichier (PDF, Word ou PowerPoint).",
+    "variations": [
+      "Le robot peut faire quoi ?",
+      "Comment utiliser l'assistant ?",
+      "À quoi sert l'IA de la plateforme ?",
+      "Ce que le chatbot peut faire",
+      "C'est quoi le chatbot de l'école ?",
+      "l'assistant sert à quoi",
+      "quel est le rôle du chatbot"
+    ]
+  },
+  {
+    "id": "CHAT_001_ar",
+    "lang": "ar",
+    "category": "المساعد الذكي والمنصة",
+    "question": "ما فائدة المساعد الذكي؟",
+    "answer": "يتيح لك المساعد الذكي الاستعلام عن معلوماتك المدرسية بلغة طبيعية: الجدول الدراسي، النقاط، الغيابات، قائمة المطعم، الواجبات والإعلانات. كما يمكنه مساعدتك في فهم درس إذا رفعت ملفه (PDF أو Word أو PowerPoint).",
+    "variations": [
+      "شنوا يعمل المساعد؟",
+      "كيف نستخدم الشات بوت؟",
+      "الذكاء الاصطناعي تاع المنصة يعمل شنوا؟",
+      "ما الذي يمكن للمساعد فعله؟",
+      "واش المساعد يقدر يساعدني في الدروس؟",
+      "ما فائدة الشات بوت",
+      "علاش عندنا شات بوت"
+    ]
+  },
+  {
+    "id": "CHAT_001_en",
+    "lang": "en",
+    "category": "Chatbot & Platform",
+    "question": "What can the chatbot do?",
+    "answer": "The chatbot lets you check your school information in natural language: schedule, grades, absences, cafeteria menu, homework, and announcements. It can also help you understand a course if you upload the file (PDF, Word, or PowerPoint).",
+    "variations": [
+      "What is the chatbot used for?",
+      "How to use the AI assistant?",
+      "What does the school chatbot do?",
+      "Can the chatbot help with courses?",
+      "What can I ask the chatbot?"
+    ]
+  },
+  {
+    "id": "CHAT_002_fr",
+    "lang": "fr",
+    "category": "Chatbot & Plateforme",
+    "question": "Comment uploader un cours pour que le chatbot l'explique ?",
+    "answer": "Cliquez sur l'icône 📎 (trombone) dans la zone de saisie du chat, puis sélectionnez votre fichier (PDF, Word .docx ou PowerPoint .pptx). Une fois uploadé, posez votre question sur le cours : « Explique-moi le chapitre 2 », « Résume ce cours », « Quels sont les points clés ? ». Le chatbot analysera le document et répondra en se basant uniquement sur son contenu.",
+    "variations": [
+      "Comment envoyer un PDF au chatbot ?",
+      "Uploader un document pour l'expliquer",
+      "Le chatbot peut lire mes cours ?",
+      "Joindre un fichier dans le chat",
+      "Envoyer un PowerPoint pour explication",
+      "Est-ce que le chatbot lit les documents ?",
+      "Comment joindre un fichier au chat ?"
+    ]
+  },
+  {
+    "id": "CHAT_002_ar",
+    "lang": "ar",
+    "category": "المساعد الذكي والمنصة",
+    "question": "كيف أرفع درساً ليشرحه المساعد؟",
+    "answer": "انقر على أيقونة 📎 في مربع الكتابة، ثم اختر ملفك (PDF أو Word أو PowerPoint). بعد الرفع، اطرح سؤالك: «اشرح لي الفصل الثاني»، «لخّص هذا الدرس»، «ما أهم النقاط؟». سيحلّل المساعد المستند ويجيبك بناءً على محتواه فقط.",
+    "variations": [
+      "كيف أبعث ملف PDF للمساعد؟",
+      "رفع ملف للشرح",
+      "واش المساعد يقرأ الكورسات؟",
+      "كيف نبعثلو ملف؟",
+      "كيفاش نرفع بريزنتاسيون للمساعد؟",
+      "شرح درس عبر المساعد",
+      "كيف أرسل ملفاً إلى المساعد؟"
+    ]
+  },
+  {
+    "id": "CHAT_002_en",
+    "lang": "en",
+    "category": "Chatbot & Platform",
+    "question": "How to upload a course file for the chatbot to explain?",
+    "answer": "Click the 📎 (paperclip) icon in the chat input area, then select your file (PDF, Word .docx or PowerPoint .pptx). Once uploaded, ask your question: 'Explain chapter 2', 'Summarize this course', 'What are the key points?' The chatbot will analyze the document and answer based solely on its content.",
+    "variations": [
+      "How to send a PDF to the chatbot?",
+      "Upload a document for explanation",
+      "Can the chatbot read my course files?",
+      "Attach a file in chat",
+      "How to get the chatbot to explain a PowerPoint?"
+    ]
+  },
+  {
+    "id": "CHAT_003_fr",
+    "lang": "fr",
+    "category": "Chatbot & Plateforme",
+    "question": "Quelles sont les limites du chatbot ?",
+    "answer": "Le chatbot ne peut pas : modifier vos notes ou absences, envoyer des messages à vos professeurs, soumettre des devoirs, ou accéder à des informations qui ne sont pas dans la plateforme. Pour ces actions, utilisez les sections correspondantes de l'application ou contactez directement l'administration.",
+    "variations": [
+      "Ce que le chatbot ne peut pas faire",
+      "Le chatbot peut changer mes notes ?",
+      "Limites de l'assistant IA",
+      "Le chatbot peut contacter mes profs ?",
+      "Peut-on soumettre des devoirs via le chatbot ?"
+    ]
+  },
+  {
+    "id": "CHAT_003_ar",
+    "lang": "ar",
+    "category": "المساعد الذكي والمنصة",
+    "question": "ما حدود المساعد الذكي؟",
+    "answer": "لا يستطيع المساعد: تعديل نقاطك أو غياباتك، إرسال رسائل لأساتذتك، تسليم الواجبات، أو الوصول إلى معلومات خارج المنصة. لهذه الإجراءات، استخدم الأقسام المخصصة في التطبيق أو تواصل مع الإدارة مباشرة.",
+    "variations": [
+      "ما الذي لا يستطيع المساعد فعله؟",
+      "هل يمكن للمساعد تغيير نقاطي؟",
+      "حدود الشات بوت",
+      "واش المساعد يقدر يبدل في نقاطي؟",
+      "هل يمكنه التواصل مع الأستاذ؟"
+    ]
+  },
+  {
+    "id": "CONN_001_fr",
+    "lang": "fr",
+    "category": "Connexion & Compte",
+    "question": "J'ai oublié mon mot de passe, que faire ?",
+    "answer": "Sur la page de connexion, cliquez sur « Mot de passe oublié ? ». Entrez votre adresse e-mail enregistrée et vous recevrez un lien de réinitialisation dans les minutes qui suivent. Si vous ne recevez rien, vérifiez vos spams ou contactez le secrétariat avec votre numéro d'élève.",
+    "variations": [
+      "Réinitialiser mon mot de passe",
+      "Je n'arrive pas à me connecter",
+      "Mot de passe perdu",
+      "Comment récupérer mon compte ?",
+      "J'ai perdu l'accès à mon compte",
+      "Problème de connexion",
+      "Je me souviens plus de mon mot de passe"
+    ]
+  },
+  {
+    "id": "CONN_001_ar",
+    "lang": "ar",
+    "category": "تسجيل الدخول والحساب",
+    "question": "نسيت كلمة المرور، ماذا أفعل؟",
+    "answer": "في صفحة تسجيل الدخول، انقر على «نسيت كلمة المرور؟». أدخل بريدك الإلكتروني المسجّل وستصلك رسالة إعادة تعيين خلال دقائق. إذا لم تصلك، تحقق من مجلد الرسائل غير المرغوب فيها (spam) أو تواصل مع الأمانة برقم تسجيل طالبك.",
+    "variations": [
+      "نسيت كلمة السر",
+      "ما نقدرش ندخل للحساب",
+      "كيف نعاود تعيين كلمة المرور؟",
+      "مشكلة في الدخول للحساب",
+      "نسيت باسوورد",
+      "كلمة المرور منساتش",
+      "كيف نرجع للحساب تاعي؟",
+      "واش نقدر نبدل كلمة المرور؟"
+    ]
+  },
+  {
+    "id": "CONN_001_en",
+    "lang": "en",
+    "category": "Login & Account",
+    "question": "I forgot my password, what should I do?",
+    "answer": "On the login page, click 'Forgot password?'. Enter your registered email address and you'll receive a reset link within minutes. If you don't receive it, check your spam folder or contact the secretariat with your student number.",
+    "variations": [
+      "Reset my password",
+      "Can't log in",
+      "Lost my password",
+      "How to recover my account?",
+      "Password recovery",
+      "I can't access my account",
+      "Forgot my login credentials"
+    ]
+  },
+  {
+    "id": "CONN_002_fr",
+    "lang": "fr",
+    "category": "Connexion & Compte",
+    "question": "Comment créer un compte sur la plateforme ?",
+    "answer": "Les comptes sont créés automatiquement par l'administration lors de l'inscription de l'élève. Vous recevez vos identifiants (e-mail + mot de passe provisoire) par e-mail. Si vous n'avez pas reçu vos identifiants, contactez le secrétariat avec la carte d'élève.",
+    "variations": [
+      "Inscription sur la plateforme",
+      "Je n'ai pas reçu mes identifiants",
+      "Comment obtenir un accès à la plateforme ?",
+      "Créer un compte élève",
+      "Première connexion à la plateforme"
+    ]
+  },
+  {
+    "id": "CONN_002_ar",
+    "lang": "ar",
+    "category": "تسجيل الدخول والحساب",
+    "question": "كيف أسجّل في المنصة؟",
+    "answer": "تُنشأ الحسابات تلقائياً من قِبل الإدارة عند تسجيل الطالب. ستصلك بيانات دخولك (البريد الإلكتروني + كلمة مرور مؤقتة) عبر البريد الإلكتروني. إذا لم تستلمها، تواصل مع الأمانة مع بطاقة الطالب.",
+    "variations": [
+      "كيف نسجل في التطبيق؟",
+      "ما وصلنيش الباسوورد تاعي",
+      "كيف نحصل على حساب؟",
+      "التسجيل في المنصة",
+      "أول دخول للمنصة"
+    ]
+  },
+  {
+    "id": "CONN_002_en",
+    "lang": "en",
+    "category": "Login & Account",
+    "question": "How to create an account on the platform?",
+    "answer": "Accounts are created automatically by the administration when the student is enrolled. You receive your credentials (email + temporary password) by email. If you haven't received them, contact the secretariat with the student card.",
+    "variations": [
+      "How to register on the platform?",
+      "I didn't receive my login credentials",
+      "How to get platform access?",
+      "Create a student account",
+      "First login to the platform"
+    ]
+  },
+  {
+    "id": "EVAL_001_fr",
+    "lang": "fr",
+    "category": "Évaluations & Notes",
+    "question": "Comment sont calculées les moyennes trimestrielles ?",
+    "answer": "La moyenne trimestrielle est calculée en pondérant les notes par leurs coefficients. Chaque matière a un coefficient défini dans le programme officiel. La moyenne générale est ensuite calculée à partir des moyennes de chaque matière, également pondérées par leurs coefficients. Les contrôles continus comptent autant que les épreuves de synthèse.",
+    "variations": [
+      "Calcul de la moyenne",
+      "Comment est calculée la note finale ?",
+      "À quoi servent les coefficients ?",
+      "Pondération des matières",
+      "Comment fonctionne le système de notation ?",
+      "Les contrôles continus comptent-ils ?"
+    ]
+  },
+  {
+    "id": "EVAL_001_ar",
+    "lang": "ar",
+    "category": "التقييم والنقاط",
+    "question": "كيف تُحسب المعدلات الفصلية؟",
+    "answer": "يُحسب المعدل الفصلي بترجيح النقاط بمعاملاتها. لكل مادة معامل محدد في البرنامج الرسمي. ثم يُحسب المعدل العام انطلاقاً من معدلات كل مادة، مُرجَّحةً هي الأخرى بمعاملاتها. الفروض الاستمرارية تحسب بنفس أهمية مناهج السنة.",
+    "variations": [
+      "كيف تحسب المعدل؟",
+      "شنوا المعامل ويش يعمل؟",
+      "كيفاش تحسب النوط؟",
+      "المعدل الفصلي كيفاش يتحسب؟",
+      "واش الفروض تحسب مع النقاط الأخرى؟",
+      "طريقة احتساب المعدل"
+    ]
+  },
+  {
+    "id": "EVAL_001_en",
+    "lang": "en",
+    "category": "Evaluations & Grades",
+    "question": "How are trimester averages calculated?",
+    "answer": "The trimester average is calculated by weighting grades by their coefficients. Each subject has a coefficient defined in the official curriculum. The overall average is then calculated from each subject's average, also weighted by their coefficients. Continuous assessments count as much as synthesis exams.",
+    "variations": [
+      "How is the average calculated?",
+      "What do coefficients do?",
+      "How does the grading system work?",
+      "Do continuous assessments count?",
+      "Grade weighting system"
+    ]
+  },
+  {
+    "id": "EVAL_002_fr",
+    "lang": "fr",
+    "category": "Évaluations & Notes",
+    "question": "Quand ont lieu les examens de synthèse ?",
+    "answer": "Les examens de synthèse se déroulent à la fin de chaque trimestre. Les dates exactes sont publiées dans le calendrier scolaire disponible sur la plateforme et affichées dans l'établissement au moins trois semaines à l'avance. Les élèves sont informés des matières et des horaires via les annonces de la plateforme.",
+    "variations": [
+      "Dates des examens",
+      "Quand sont les examens ?",
+      "Calendrier des épreuves",
+      "Examens de fin de trimestre",
+      "Programme des examens"
+    ]
+  },
+  {
+    "id": "EVAL_002_ar",
+    "lang": "ar",
+    "category": "التقييم والنقاط",
+    "question": "متى تُعقد اختبارات الفصل؟",
+    "answer": "تُجرى اختبارات الفصل في نهاية كل ثلاثة أشهر. تُنشر المواعيد الدقيقة في الروزنامة المدرسية المتاحة على المنصة وتُعلَّق داخل المؤسسة قبل ثلاثة أسابيع على الأقل. يُبلَّغ التلاميذ بالمواد والمواعيد عبر إعلانات المنصة.",
+    "variations": [
+      "متى الامتحانات؟",
+      "وقتاش الإمتحانات؟",
+      "مواعيد الفروض",
+      "امتحانات نهاية الفصل",
+      "برنامج الامتحانات",
+      "وقتاش الإختبارات؟"
+    ]
+  },
+  {
+    "id": "EVAL_002_en",
+    "lang": "en",
+    "category": "Evaluations & Grades",
+    "question": "When do the trimester exams take place?",
+    "answer": "Trimester exams take place at the end of each trimester. Exact dates are published in the school calendar available on the platform and posted in the school at least three weeks in advance. Students are informed of subjects and schedules through platform announcements.",
+    "variations": [
+      "When are the exams?",
+      "Exam dates",
+      "End of trimester exam schedule",
+      "When are finals?",
+      "Exam timetable"
+    ]
+  },
+  {
+    "id": "DISC_001_fr",
+    "lang": "fr",
+    "category": "Règlement & Discipline",
+    "question": "Quelles sont les règles de tenue vestimentaire ?",
+    "answer": "L'établissement impose une tenue correcte et décente. Le port d'une tenue spécifique (uniforme) peut être requis selon le règlement intérieur. Les vêtements à messages inappropriés, les shorts et les tenues de sport sont interdits en dehors des cours d'EPS. En cas de doute, consultez le règlement intérieur disponible au secrétariat ou sur la plateforme.",
+    "variations": [
+      "Uniforme scolaire obligatoire ?",
+      "Code vestimentaire de l'école",
+      "Peut-on porter ce qu'on veut à l'école ?",
+      "Tenue exigée à l'école",
+      "Y a-t-il un uniforme ?"
+    ]
+  },
+  {
+    "id": "DISC_001_ar",
+    "lang": "ar",
+    "category": "النظام الداخلي والانضباط",
+    "question": "ما هي قواعد اللباس في المدرسة؟",
+    "answer": "تشترط المؤسسة ارتداء لباس لائق ومحتشم. قد يكون الزي المدرسي المحدد إلزامياً وفق النظام الداخلي. تُمنع الملابس ذات الرسائل غير اللائقة والسراويل القصيرة وملابس الرياضة خارج حصص التربية البدنية. للاطلاع على مزيد من التفاصيل، راجع النظام الداخلي المتاح في الأمانة أو على المنصة.",
+    "variations": [
+      "هل اللباس المدرسي إجباري؟",
+      "ما قواعد الملبس في المدرسة؟",
+      "واش نلبسوا زي موحد؟",
+      "هل يوجد زي موحد؟",
+      "شروط اللباس في المؤسسة",
+      "واش نقدر نلبس شنوا حبيت؟"
+    ]
+  },
+  {
+    "id": "DISC_001_en",
+    "lang": "en",
+    "category": "Rules & Discipline",
+    "question": "What are the dress code rules?",
+    "answer": "The school requires appropriate and decent clothing. A specific uniform may be required according to the internal rules. Clothing with inappropriate messages, shorts, and sportswear are not allowed outside PE classes. For details, check the school's internal rules available at the secretariat or on the platform.",
+    "variations": [
+      "Is uniform mandatory?",
+      "School dress code",
+      "Can I wear anything to school?",
+      "What clothing is required?",
+      "Do we have to wear a uniform?"
+    ]
+  },
+  {
+    "id": "DISC_002_fr",
+    "lang": "fr",
+    "category": "Règlement & Discipline",
+    "question": "Que se passe-t-il si un élève est souvent absent ?",
+    "answer": "Au-delà d'un certain nombre d'absences non justifiées (généralement 6 demi-journées par trimestre), l'élève est convoqué avec ses parents par le conseil de discipline. Les absences répétées peuvent entraîner une exclusion temporaire ou définitive. Chaque absence doit être justifiée par écrit dans les 48 heures suivant le retour de l'élève.",
+    "variations": [
+      "Conséquences des absences répétées",
+      "Combien d'absences sont tolérées ?",
+      "Que risque un élève souvent absent ?",
+      "Exclusion pour absences ?",
+      "Comment justifier une absence ?"
+    ]
+  },
+  {
+    "id": "DISC_002_ar",
+    "lang": "ar",
+    "category": "النظام الداخلي والانضباط",
+    "question": "ماذا يحدث إذا كان الطالب كثير الغياب؟",
+    "answer": "عند تجاوز عدد معين من الغيابات غير المبررة (عادةً 6 جلسات نصف يوم في الفصل)، يُستدعى الطالب مع والديه أمام مجلس الانضباط. قد تؤدي الغيابات المتكررة إلى الإيقاف المؤقت أو الطرد النهائي. يجب تبرير كل غياب كتابياً خلال 48 ساعة من عودة الطالب.",
+    "variations": [
+      "عواقب الغياب المتكرر",
+      "كم غيبة مسموح بها؟",
+      "واش يطردوني بسبب الغياب؟",
+      "كيف نبرر الغياب؟",
+      "ما عقوبة الغياب الكثير؟",
+      "الغياب الكثير واش يعمل؟"
+    ]
+  },
+  {
+    "id": "DISC_002_en",
+    "lang": "en",
+    "category": "Rules & Discipline",
+    "question": "What happens if a student is frequently absent?",
+    "answer": "Beyond a certain number of unjustified absences (usually 6 half-days per trimester), the student is summoned with their parents before the discipline board. Repeated absences can lead to temporary or permanent expulsion. Each absence must be justified in writing within 48 hours of the student's return.",
+    "variations": [
+      "Consequences of repeated absences",
+      "How many absences are allowed?",
+      "Can I get expelled for absences?",
+      "How to justify an absence?",
+      "Absence policy"
+    ]
+  },
+  {
+    "id": "HEAL_001_fr",
+    "lang": "fr",
+    "category": "Santé & Infirmerie",
+    "question": "Où se trouve l'infirmerie ?",
+    "answer": "L'infirmerie est située au rez-de-chaussée du bâtiment principal, à côté du bureau du directeur. Elle est ouverte de 8h00 à 16h00. En cas de malaise, d'accident ou de problème de santé, l'élève doit se rendre à l'infirmerie accompagné d'un surveillant. Pour les urgences, le 15 (SAMU) peut être contacté.",
+    "variations": [
+      "Je suis malade, que faire à l'école ?",
+      "Où aller si je me sens mal ?",
+      "Infirmière de l'école",
+      "Soins médicaux à l'école",
+      "En cas d'accident à l'école"
+    ]
+  },
+  {
+    "id": "HEAL_001_ar",
+    "lang": "ar",
+    "category": "الصحة والطوارئ",
+    "question": "أين يقع مركز الإسعاف في المدرسة؟",
+    "answer": "يقع مركز الإسعاف (الإنفرماري) في الطابق الأرضي من المبنى الرئيسي، بجانب مكتب المدير. يكون مفتوحاً من 8:00 إلى 16:00. في حالة الإغماء أو الحادث أو أي مشكلة صحية، يجب على الطالب التوجه إلى مركز الإسعاف بمرافقة مراقب. للحالات الطارئة، يمكن الاتصال بـ 15 (المستعجلات).",
+    "variations": [
+      "وين الإنفرماري؟",
+      "أنا تعبان، واش نعمل؟",
+      "وين نروح إذا كنت مريض في المدرسة؟",
+      "ممرضة المدرسة وين تلقاها؟",
+      "في حالة حادث في المدرسة",
+      "إذا حسيت بدوار في القسم"
+    ]
+  },
+  {
+    "id": "HEAL_001_en",
+    "lang": "en",
+    "category": "Health & Infirmary",
+    "question": "Where is the school infirmary?",
+    "answer": "The infirmary is located on the ground floor of the main building, next to the principal's office. It is open from 8:00 AM to 4:00 PM. In case of illness, accident, or health issue, the student must go to the infirmary accompanied by a supervisor. For emergencies, call 15 (SAMU).",
+    "variations": [
+      "I feel sick, what should I do at school?",
+      "Where to go if I feel unwell?",
+      "School nurse location",
+      "Medical care at school",
+      "In case of accident at school"
+    ]
+  },
+  {
+    "id": "PLAT_001_fr",
+    "lang": "fr",
+    "category": "Fonctionnalités Plateforme",
+    "question": "Comment consulter mon emploi du temps sur la plateforme ?",
+    "answer": "Dans l'application, accédez à la section « Emploi du temps » depuis le menu principal. Vous y trouverez votre planning semaine par semaine, avec les matières, les horaires et les salles. Vous pouvez également demander au chatbot : « Quels sont mes cours aujourd'hui ? ».",
+    "variations": [
+      "Voir mon planning sur l'app",
+      "Accéder à mon emploi du temps",
+      "Comment savoir quels cours j'ai ?",
+      "Trouver mon EDT sur la plateforme",
+      "Où voir mes horaires de cours ?"
+    ]
+  },
+  {
+    "id": "PLAT_001_ar",
+    "lang": "ar",
+    "category": "مميزات المنصة",
+    "question": "كيف أطّلع على جدولي الدراسي عبر المنصة؟",
+    "answer": "في التطبيق، انتقل إلى قسم «الجدول الدراسي» من القائمة الرئيسية. ستجد فيه برنامجك أسبوعاً بأسبوع مع المواد والمواعيد والقاعات. يمكنك أيضاً سؤال المساعد: «ما دروسي اليوم؟».",
+    "variations": [
+      "كيف أشوف الجدول في التطبيق؟",
+      "وين نلقى الجدول تاعي؟",
+      "كيفاش نشوف دروسي؟",
+      "الجدول الدراسي وين يكون؟",
+      "كيف أعرف حصصي؟"
+    ]
+  },
+  {
+    "id": "PLAT_001_en",
+    "lang": "en",
+    "category": "Platform Features",
+    "question": "How to check my schedule on the platform?",
+    "answer": "In the app, go to the 'Schedule' section from the main menu. You'll find your weekly schedule with subjects, times, and rooms. You can also ask the chatbot: 'What classes do I have today?'.",
+    "variations": [
+      "View my timetable on the app",
+      "Access my schedule",
+      "How to see what classes I have?",
+      "Find my schedule on the platform",
+      "Where to see my class times?"
+    ]
+  },
+  {
+    "id": "PLAT_002_fr",
+    "lang": "fr",
+    "category": "Fonctionnalités Plateforme",
+    "question": "Comment voir mes notes sur la plateforme ?",
+    "answer": "Accédez à la section « Notes » depuis le menu principal. Vous y trouverez toutes vos notes par matière et par trimestre, ainsi que vos moyennes. Vous pouvez aussi télécharger votre bulletin scolaire en PDF depuis cette section. Le chatbot peut également vous donner un résumé rapide de vos notes.",
+    "variations": [
+      "Consulter mes notes en ligne",
+      "Accès à mon bulletin",
+      "Voir mes résultats sur l'app",
+      "Télécharger mon bulletin PDF",
+      "Où trouver mes notes sur l'application ?"
+    ]
+  },
+  {
+    "id": "PLAT_002_ar",
+    "lang": "ar",
+    "category": "مميزات المنصة",
+    "question": "كيف أطّلع على نقاطي في المنصة؟",
+    "answer": "انتقل إلى قسم «النقاط» من القائمة الرئيسية. ستجد فيه جميع نقاطك حسب المادة والفصل، وكذلك معدلاتك. يمكنك أيضاً تحميل كشف نقاطك بصيغة PDF من هذا القسم. كما يستطيع المساعد تزويدك بملخص سريع لنقاطك.",
+    "variations": [
+      "كيف نشوف النوط تاعتي؟",
+      "وين نلقى نتائجي في التطبيق؟",
+      "كيف أرى معدلي؟",
+      "تحميل كشف النقاط",
+      "وين تلقى النقاط في التطبيق؟"
+    ]
+  },
+  {
+    "id": "PLAT_002_en",
+    "lang": "en",
+    "category": "Platform Features",
+    "question": "How to view my grades on the platform?",
+    "answer": "Go to the 'Grades' section from the main menu. You'll find all your grades by subject and trimester, along with your averages. You can also download your report card as a PDF from this section. The chatbot can also give you a quick summary of your grades.",
+    "variations": [
+      "View my grades online",
+      "Access my report card",
+      "See my results in the app",
+      "Download report card PDF",
+      "Where to find my grades in the app?"
+    ]
+  },
+  {
+    "id": "CANT_001_fr",
+    "lang": "fr",
+    "category": "Cantine",
+    "question": "Comment s'inscrire à la cantine ?",
+    "answer": "L'inscription à la cantine se fait au secrétariat en début d'année ou de trimestre. Vous pouvez vous inscrire pour l'année complète ou par trimestre. Des formules journalières peuvent être disponibles selon les disponibilités. Le paiement s'effectue à l'avance au secrétariat ou via la plateforme si cette option est activée.",
+    "variations": [
+      "Abonnement cantine",
+      "Comment manger à la cantine ?",
+      "Inscription au restaurant scolaire",
+      "Tarif de la cantine",
+      "Est-ce que ma fille peut manger à la cantine ?"
+    ]
+  },
+  {
+    "id": "CANT_001_ar",
+    "lang": "ar",
+    "category": "المطعم المدرسي",
+    "question": "كيف التسجيل في المطعم المدرسي؟",
+    "answer": "يتم التسجيل في المطعم المدرسي بالأمانة في بداية السنة أو الفصل. يمكن التسجيل لسنة كاملة أو بالفصل. قد تتوفر تذاكر يومية حسب الطاقة الاستيعابية. يتم الدفع مسبقاً بالأمانة أو عبر المنصة إن توفرت هذه الإمكانية.",
+    "variations": [
+      "كيف نتسجل في الكانتين؟",
+      "اشتراك المطعم المدرسي",
+      "كيف ياكل ولدي في المدرسة؟",
+      "سعر وجبة الكانتين",
+      "التسجيل في مطعم المدرسة",
+      "واش يكون كانتين؟"
+    ]
+  },
+  {
+    "id": "CANT_001_en",
+    "lang": "en",
+    "category": "Cafeteria",
+    "question": "How to register for the school cafeteria?",
+    "answer": "Registration for the cafeteria is done at the secretariat at the beginning of the year or trimester. You can register for the full year or per trimester. Daily meal tickets may be available depending on capacity. Payment is made in advance at the secretariat or via the platform if this option is enabled.",
+    "variations": [
+      "Cafeteria subscription",
+      "How to eat at the school cafeteria?",
+      "School cafeteria registration",
+      "Cafeteria pricing",
+      "Can my child eat at the cafeteria?"
+    ]
+  },
+  {
+    "id": "ABS_001_fr",
+    "lang": "fr",
+    "category": "Absences & Justificatifs",
+    "question": "Comment justifier une absence ?",
+    "answer": "Pour justifier une absence, apportez un certificat médical ou une lettre parentale signée dans les 48 heures suivant le retour de l'élève. Le document doit être remis au professeur principal ou au secrétariat. Les absences pour raisons médicales nécessitent un certificat de médecin. Après 3 jours d'absence consécutifs, un certificat médical est obligatoire.",
+    "variations": [
+      "Mot d'excuse pour absence",
+      "Certificat médical pour l'école",
+      "Comment informer l'école d'une absence ?",
+      "Justificatif d'absence",
+      "Que faire quand l'élève revient après une absence ?"
+    ]
+  },
+  {
+    "id": "ABS_001_ar",
+    "lang": "ar",
+    "category": "الغيابات والتبريرات",
+    "question": "كيف أبرر الغياب؟",
+    "answer": "لتبرير الغياب، يجب تقديم شهادة طبية أو رسالة والدية موقعة خلال 48 ساعة من عودة الطالب. يُسلَّم الوثيقة إلى الأستاذ الرئيسي أو الأمانة. الغيابات لأسباب طبية تستلزم شهادة طبيب. بعد 3 أيام غياب متتالية، الشهادة الطبية إلزامية.",
+    "variations": [
+      "كيف نبرر الغياب؟",
+      "واش نحتاج شهادة طبية؟",
+      "رسالة تبرير الغياب",
+      "كيف يعلم الأهل المدرسة بالغياب؟",
+      "ما يلزم لتبرير الغياب؟",
+      "واجبات بعد الغياب",
+      "كيفاش نعمل إذا غبت؟"
+    ]
+  },
+  {
+    "id": "ABS_001_en",
+    "lang": "en",
+    "category": "Absences & Justification",
+    "question": "How to justify an absence?",
+    "answer": "To justify an absence, bring a medical certificate or a signed parental letter within 48 hours of the student's return. The document must be given to the homeroom teacher or secretariat. Absences for medical reasons require a doctor's certificate. After 3 consecutive days of absence, a medical certificate is mandatory.",
+    "variations": [
+      "Excuse note for absence",
+      "Medical certificate for school",
+      "How to inform school of absence?",
+      "Absence justification document",
+      "What to do when student returns after absence?"
+    ]
+  }
 ]

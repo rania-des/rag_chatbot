@@ -13,6 +13,10 @@ import io
 import os
 from pathlib import Path
 from typing import List, Tuple
+import pytesseract
+from PIL import Image, ImageEnhance, ImageFilter
+
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 # Seuil en dessous duquel on considère qu'un PDF est scanné (pas de texte extractible)
 OCR_FALLBACK_THRESHOLD_CHARS = 100
@@ -106,9 +110,21 @@ def _parse_pdf_ocr(file_path: str) -> List[Tuple[int, str]]:
 def _parse_image_ocr(file_path: str) -> List[Tuple[int, str]]:
     from PIL import Image
     import pytesseract
+    import numpy as np
+
+    img = Image.open(file_path)
+    # Convertir en niveaux de gris
+    img = img.convert('L')
+    # Augmenter le contraste
+    enhancer = ImageEnhance.Contrast(img)
+    img = enhancer.enhance(2.0)
+    # Binariser (seuil adaptatif)
+    img = img.point(lambda x: 0 if x < 128 else 255, '1')
+    # Optionnel : redimensionner (×2) pour meilleure reconnaissance
+    w, h = img.size
+    img = img.resize((w*2, h*2), Image.Resampling.LANCZOS)
 
     lang = "ara+fra+eng"
-    img = Image.open(file_path)
     try:
         text = pytesseract.image_to_string(img, lang=lang)
     except pytesseract.TesseractError:
